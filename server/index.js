@@ -58,7 +58,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     try {
       if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-    } catch (e) {}
+    } catch (e) { }
     cb(null, UPLOADS_DIR);
   },
   filename: (req, file, cb) => {
@@ -105,7 +105,7 @@ function readDb() {
     if (fs.existsSync(SEED_DB_FILE)) {
       try {
         return JSON.parse(fs.readFileSync(SEED_DB_FILE, 'utf-8'));
-      } catch (e) {}
+      } catch (e) { }
     }
     return {
       users: [],

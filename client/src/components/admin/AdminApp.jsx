@@ -216,28 +216,33 @@ export const AdminApp = ({ onNavigateHome }) => {
 
       {/* RIGHT SIDE: FIXED HEADER & SCROLLABLE CONTENT */}
       <div className="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
-        {/* FIXED HEADER: Never moves when scrolling */}
-        <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20 shadow-xs">
-          <div className="flex items-center gap-3">
+        {/* FIXED HEADER: Never moves when scrolling, fully responsive on mobile */}
+        <header className="h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shrink-0 z-20 shadow-xs gap-2">
+          {/* Left: Mobile Menu Toggle + Company Logo + Current Tab */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="lg:hidden p-1.5 sm:p-2 rounded-lg text-slate-600 hover:bg-slate-100 shrink-0"
+              aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <img
-              src="/logo.png"
-              alt="Tirupati Balaji Tours & Travels"
-              className="h-10 w-auto object-contain cursor-pointer"
-              onClick={onNavigateHome}
-            />
-            <div className="hidden sm:block h-5 w-px bg-slate-200 mx-1"></div>
-            <h2 className="hidden sm:block font-heading font-extrabold text-base text-slate-900 capitalize">
+            <div className="min-w-0 flex items-center overflow-hidden">
+              <img
+                src="/logo.png"
+                alt="Tirupati Balaji Tours & Travels"
+                className="h-7 sm:h-9 md:h-10 max-w-[130px] min-[380px]:max-w-[165px] sm:max-w-none w-auto object-contain cursor-pointer shrink-0"
+                onClick={onNavigateHome}
+              />
+            </div>
+            <div className="hidden sm:block h-5 w-px bg-slate-200 mx-1 shrink-0"></div>
+            <h2 className="hidden sm:block font-heading font-extrabold text-base text-slate-900 capitalize truncate">
               {activeTab.replace('_', ' ')}
             </h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Right: Mode Badge + Notifications + Sign Out */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <span className="hidden sm:inline-flex text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-bold">
               ● Live Admin Mode
             </span>
@@ -245,7 +250,7 @@ export const AdminApp = ({ onNavigateHome }) => {
             {/* Notification Bell */}
             <button
               onClick={() => setIsNotifOpen(true)}
-              className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+              className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors shrink-0"
               title="Notifications"
             >
               <Bell className="w-4 h-4" />
@@ -256,11 +261,13 @@ export const AdminApp = ({ onNavigateHome }) => {
               )}
             </button>
 
+            {/* Sign Out Button */}
             <button
               onClick={logout}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+              title="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
             </button>
           </div>

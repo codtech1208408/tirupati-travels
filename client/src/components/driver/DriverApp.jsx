@@ -29,14 +29,16 @@ import {
   Menu,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { NotificationsDrawer } from '../common/NotificationsDrawer';
 
 export const DriverApp = ({ onNavigateHome }) => {
-  const { user, token, logout, refreshUser } = useAuth();
+  const { user, token, logout, refreshUser, unreadCount } = useAuth();
 
   // Screen states: 'dashboard' | 'trips' | 'trip_details' | 'add_expense' | 'wallet' | 'availability' | 'profile'
   const [currentScreen, setCurrentScreen] = useState('dashboard');
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [tripsTab, setTripsTab] = useState('ongoing'); // 'upcoming' | 'ongoing' | 'completed'
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   // Driver data
   const [driverTrips, setDriverTrips] = useState([]);
@@ -254,18 +256,20 @@ export const DriverApp = ({ onNavigateHome }) => {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-100 font-sans">
-      {/* FIXED TOP HEADER: Never moves when scrolling (both Desktop & Mobile) */}
-      <header className="h-16 bg-[#1e1035] text-white px-4 sm:px-6 flex items-center justify-between shrink-0 z-30 shadow-md">
-        {/* Logo and App Title */}
-        <div className="flex items-center gap-3">
-          <img
-            src="/logo.png"
-            alt="Tirupati Balaji Tours & Travels"
-            className="h-10 w-auto bg-white p-1 rounded-lg object-contain cursor-pointer"
-            onClick={onNavigateHome}
-          />
-          <div className="hidden sm:block h-5 w-px bg-purple-800 mx-1"></div>
-          <span className="hidden sm:inline-block font-heading font-extrabold text-sm text-orange-400 uppercase tracking-wider">
+      {/* FIXED TOP HEADER: Never moves when scrolling, fully responsive on mobile */}
+      <header className="h-16 bg-[#1e1035] text-white px-3 sm:px-6 flex items-center justify-between shrink-0 z-30 shadow-md gap-2">
+        {/* Left: Logo and App Title */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="min-w-0 flex items-center overflow-hidden">
+            <img
+              src="/logo.png"
+              alt="Tirupati Balaji Tours & Travels"
+              className="h-7 sm:h-9 md:h-10 max-w-[130px] min-[380px]:max-w-[165px] sm:max-w-none w-auto bg-white p-1 rounded-lg object-contain cursor-pointer shrink-0"
+              onClick={onNavigateHome}
+            />
+          </div>
+          <div className="hidden sm:block h-5 w-px bg-purple-800 mx-1 shrink-0"></div>
+          <span className="hidden sm:inline-block font-heading font-extrabold text-sm text-orange-400 uppercase tracking-wider truncate">
             Driver Terminal
           </span>
         </div>
@@ -303,11 +307,11 @@ export const DriverApp = ({ onNavigateHome }) => {
         </nav>
 
         {/* Right Status Controls */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Availability Pill */}
           <button
             onClick={() => setCurrentScreen('availability')}
-            className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border ${
+            className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${
               availability === 'Available'
                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                 : availability === 'On Trip'
@@ -316,7 +320,7 @@ export const DriverApp = ({ onNavigateHome }) => {
             }`}
           >
             <span
-              className={`w-2 h-2 rounded-full ${
+              className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                 availability === 'Available'
                   ? 'bg-emerald-400'
                   : availability === 'On Trip'
@@ -330,16 +334,30 @@ export const DriverApp = ({ onNavigateHome }) => {
           {/* Wallet Balance Badge */}
           <div
             onClick={() => setCurrentScreen('wallet')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer transition-colors shrink-0"
           >
             <Wallet className="w-3.5 h-3.5 text-orange-400" />
             <span>₹{(walletData.walletBalance || 24500).toLocaleString()}</span>
           </div>
 
+          {/* Notification Bell */}
+          <button
+            onClick={() => setIsNotifOpen(true)}
+            className="relative p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-200 hover:text-white transition-colors shrink-0"
+            title="Notifications"
+          >
+            <Bell className="w-4 h-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
           {/* Exit / Logout */}
           <button
             onClick={logout}
-            className="p-1.5 rounded-lg text-purple-200 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-purple-200 hover:text-rose-200 transition-colors shrink-0"
             title="Log Out"
           >
             <LogOut className="w-4 h-4" />
@@ -1221,6 +1239,9 @@ export const DriverApp = ({ onNavigateHome }) => {
           );
         })}
       </nav>
+
+      {/* Notifications Drawer */}
+      <NotificationsDrawer isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
     </div>
   );
 };
