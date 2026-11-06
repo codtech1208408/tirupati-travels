@@ -1,0 +1,228 @@
+import React, { useState, useEffect } from 'react';
+import {
+  X,
+  DollarSign,
+  Receipt,
+  CheckCircle2,
+  AlertCircle,
+  Wallet,
+  ArrowRight,
+  ShieldCheck,
+  TrendingUp,
+} from 'lucide-react';
+
+export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
+  const [salary, setSalary] = useState(trip?.salary || 18000);
+  const [closeNotes, setCloseNotes] = useState('');
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (trip) {
+      setSalary(trip.salary || 18000);
+      // Fetch expenses for this trip
+      const token = localStorage.getItem('tb_token');
+      fetch(`/api/expenses?tripId=${trip.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setExpenses(data.expenses || []))
+        .catch(console.error);
+    }
+  }, [trip]);
+
+  if (!isOpen || !trip) return null;
+
+  const approvedExpenses = expenses.filter((e) => e.status === 'Approved');
+  const pendingExpenses = expenses.filter((e) => e.status === 'Pending');
+  const totalApproved = approvedExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  const totalPending = pendingExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  const numSalary = Number(salary) || 0;
+  const totalCreditToWallet = numSalary; // Trip salary to credit
+
+  const handleCloseDeal = async (e) => {
+    e.preventDefault();
+    if (numSalary <= 0) {
+      setError('Please specify a valid driver salary for this trip.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem('tb_token');
+
+    try {
+      const res = await fetch(`/api/trips/${trip.id}/close-deal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          salary: numSalary,
+          notes: closeNotes,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to close deal');
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-[#1e1035] to-[#2b144d] p-5 text-white flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-orange-500 rounded-lg text-white">
+              <DollarSign className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-heading font-bold text-lg">Close Trip Deal & Credit Wallet</h3>
+              <p className="text-xs text-purple-200">
+                Final settlement for {trip.id} • Driver: {trip.driverName || 'Assigned Driver'}
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-full text-slate-300 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleCloseDeal} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Workflow Notice */}
+          <div className="p-3.5 bg-purple-50/70 border border-purple-200 rounded-xl text-xs text-purple-950 space-y-1">
+            <div className="font-bold flex items-center gap-1.5 text-purple-900">
+              <ShieldCheck className="w-4 h-4 text-purple-700" />
+              Deal Closing Workflow
+            </div>
+            <p className="text-[11px] text-purple-800 leading-relaxed">
+              1. Review driver expenses for this trip.
+              <br />
+              2. Enter the driver's contracted trip salary.
+              <br />
+              3. Closing the deal changes trip status to <strong>Closed (read-only)</strong> and credits
+              the salary directly to the driver's digital wallet ledger.
+            </p>
+          </div>
+
+          {/* Expense Audit Breakdown */}
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 text-xs">
+            <div className="flex items-center justify-between font-semibold text-slate-700">
+              <span className="flex items-center gap-1.5">
+                <Receipt className="w-4 h-4 text-orange-500" />
+                Driver Expenses Logged ({expenses.length})
+              </span>
+              <span className="font-heading font-bold text-slate-900">
+                Total: ₹
+                {expenses
+                  .reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+                  .toLocaleString()}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+              <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800">
+                <span className="block font-medium">Approved Reimbursements:</span>
+                <span className="font-bold text-sm">₹{totalApproved.toLocaleString()}</span>
+              </div>
+              <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800">
+                <span className="block font-medium">Pending Approvals:</span>
+                <span className="font-bold text-sm">₹{totalPending.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Salary Input */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Driver Trip Salary Amount (₹) *
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">₹</span>
+              <input
+                type="number"
+                required
+                min="0"
+                value={salary}
+                onChange={(e) => setSalary(e.target.value)}
+                className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-base font-heading font-bold text-slate-900 focus:ring-2 focus:ring-orange-500 outline-hidden"
+              />
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Agreed driver remuneration for completing the route {trip.route}
+            </p>
+          </div>
+
+          {/* Closing Notes */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Deal Closing Remarks / Verification Notes
+            </label>
+            <textarea
+              rows="2"
+              placeholder="Pilgrim feedback satisfactory, clean vehicle return, odometer verified..."
+              value={closeNotes}
+              onChange={(e) => setCloseNotes(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
+            ></textarea>
+          </div>
+
+          {/* Net Credit Summary Card */}
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white flex items-center justify-between shadow-md">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Wallet className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold text-orange-100 uppercase tracking-wider">
+                  Net Wallet Credit to Driver
+                </p>
+                <p className="text-xs text-white/90">Instant ledger balance update</p>
+              </div>
+            </div>
+            <span className="font-heading font-extrabold text-2xl">
+              ₹{totalCreditToWallet.toLocaleString()}
+            </span>
+          </div>
+
+          {/* Actions */}
+          <div className="pt-2 flex justify-end gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-5 py-2.5 bg-gradient-to-r from-purple-900 to-purple-950 hover:from-purple-950 hover:to-black text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>{loading ? 'Closing Deal...' : 'Confirm & Close Deal'}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+

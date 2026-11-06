@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="550" viewBox="0 0 400 550">
+    <rect width="400" height="550" fill="#ffffff" rx="12"/>
+    <rect x="15" y="15" width="370" height="520" fill="#fdfbf7" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4,4" rx="8"/>
+    <text x="200" y="60" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#1e1b4b">TIRUPATI BALAJI TOURS</text>
+    <text x="200" y="85" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">Trip Expense Voucher / Bill Proof</text>
+    <line x1="35" y1="105" x2="365" y2="105" stroke="#cbd5e1" stroke-width="1.5"/>
+    
+    <text x="45" y="140" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#334155">CATEGORY:</text>
+    <text x="355" y="140" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="end" fill="#ea580c">FUEL INVOICE</text>
+    
+    <text x="45" y="175" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Date:</text>
+    <text x="355" y="175" font-family="Arial, sans-serif" font-size="13" text-anchor="end" fill="#1e293b">05 Nov 2026</text>
+    
+    <text x="45" y="210" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Vehicle:</text>
+    <text x="355" y="210" font-family="Arial, sans-serif" font-size="13" text-anchor="end" fill="#1e293b">Tempo Traveller (AP 39 AB 1234)</text>
+    
+    <text x="45" y="245" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Driver:</text>
+    <text x="355" y="245" font-family="Arial, sans-serif" font-size="13" text-anchor="end" fill="#1e293b">Ramesh (TIR-2026-034)</text>
+    
+    <line x1="35" y1="275" x2="365" y2="275" stroke="#cbd5e1" stroke-width="1.5"/>
+    
+    <text x="45" y="310" font-family="Arial, sans-serif" font-size="13" fill="#475569">Particulars: Diesel refill 38.5L @ IOCL Nellore</text>
+    
+    <rect x="35" y="360" width="330" height="70" fill="#f1f5f9" rx="8"/>
+    <text x="55" y="403" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e1b4b">TOTAL AMOUNT</text>
+    <text x="345" y="405" font-family="Arial, sans-serif" font-size="22" font-weight="bold" text-anchor="end" fill="#ea580c">₹3,500</text>
+    
+    <circle cx="200" cy="480" r="32" fill="none" stroke="#16a34a" stroke-width="3"/>
+    <text x="200" y="478" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#16a34a">DIGITALLY</text>
+    <text x="200" y="492" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#16a34a">VERIFIED</text>
+  </svg>

@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-purple: #1e1035;
+    --brand-purple-dark: #120824;
+    --brand-purple-light: #2b144d;
+    --brand-orange: #f97316;
+    --brand-orange-dark: #ea580c;
+    --brand-orange-light: #fb923c;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    background-color: #f8fafc;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+/* Custom animations and styling */
+.purple-gradient {
+  background: linear-gradient(135deg, #1e1035 0%, #2b144d 50%, #160a2c 100%);
+}
+
+.orange-gradient {
+  background: linear-gradient(135deg, #ff6b00 0%, #ea580c 100%);
+}
+
+.card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(30, 16, 53, 0.08), 0 2px 6px -1px rgba(30, 16, 53, 0.04);
+}
+
+.card-shadow-hover {
+  transition: all 0.25s ease;
+}
+.card-shadow-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -4px rgba(30, 16, 53, 0.12), 0 4px 10px -2px rgba(30, 16, 53, 0.06);
+}
+
+/* Hide scrollbar for clean mobile tabs */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
