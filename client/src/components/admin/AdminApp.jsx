@@ -231,7 +231,7 @@ export const AdminApp = ({ onNavigateHome }) => {
               <img
                 src="/logo.png"
                 alt="Tirupati Balaji Tours & Travels"
-                className="h-7 sm:h-9 md:h-10 max-w-[130px] min-[380px]:max-w-[165px] sm:max-w-none w-auto object-contain cursor-pointer shrink-0"
+                className="h-[34px] sm:h-10 max-w-[160px] min-[380px]:max-w-[190px] sm:max-w-none w-auto object-contain cursor-pointer shrink-0"
                 onClick={onNavigateHome}
               />
             </div>

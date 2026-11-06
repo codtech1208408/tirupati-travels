@@ -82,9 +82,8 @@ export const ManagerApp = ({ onNavigateHome }) => {
     <div className="h-screen w-screen overflow-hidden flex bg-slate-100 font-sans">
       {/* FIXED LEFT SIDEBAR (No scrolling away, duplicate logo removed) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1b1030] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${
-          isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1b1030] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          }`}
       >
         {/* Header - No duplicate logo */}
         <div className="p-4 border-b border-purple-900/50 flex items-center justify-between shrink-0">
@@ -145,11 +144,10 @@ export const ManagerApp = ({ onNavigateHome }) => {
                 setActiveTab('trips');
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'trips'
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'trips'
                   ? 'bg-orange-500 text-white shadow-md'
                   : 'text-purple-200 hover:bg-white/10 hover:text-white'
-              }`}
+                }`}
             >
               <Calendar className="w-4 h-4" />
               <span>Trips & Dispatch</span>
@@ -167,11 +165,10 @@ export const ManagerApp = ({ onNavigateHome }) => {
                 setActiveTab('expenses');
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'expenses'
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'expenses'
                   ? 'bg-orange-500 text-white shadow-md'
                   : 'text-purple-200 hover:bg-white/10 hover:text-white'
-              }`}
+                }`}
             >
               <Receipt className="w-4 h-4" />
               <span>Review Driver Expenses</span>
@@ -189,11 +186,10 @@ export const ManagerApp = ({ onNavigateHome }) => {
                 setActiveTab('reports');
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'reports'
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'reports'
                   ? 'bg-orange-500 text-white shadow-md'
                   : 'text-purple-200 hover:bg-white/10 hover:text-white'
-              }`}
+                }`}
             >
               <FileText className="w-4 h-4" />
               <span>Fleet Reports</span>
@@ -242,7 +238,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
               <img
                 src="/logo.png"
                 alt="Tirupati Balaji Tours & Travels"
-                className="h-7 sm:h-9 md:h-10 max-w-[130px] min-[380px]:max-w-[165px] sm:max-w-none w-auto object-contain cursor-pointer shrink-0"
+                className="h-[34px] sm:h-10 max-w-[160px] min-[380px]:max-w-[190px] sm:max-w-none w-auto object-contain cursor-pointer shrink-0"
                 onClick={onNavigateHome}
               />
             </div>

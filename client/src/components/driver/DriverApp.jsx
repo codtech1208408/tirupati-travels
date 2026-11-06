@@ -264,7 +264,7 @@ export const DriverApp = ({ onNavigateHome }) => {
             <img
               src="/logo.png"
               alt="Tirupati Balaji Tours & Travels"
-              className="h-7 sm:h-9 md:h-10 max-w-[130px] min-[380px]:max-w-[165px] sm:max-w-none w-auto bg-white p-1 rounded-lg object-contain cursor-pointer shrink-0"
+              className="h-[34px] sm:h-10 max-w-[160px] min-[380px]:max-w-[190px] sm:max-w-none w-auto bg-white p-1 rounded-lg object-contain cursor-pointer shrink-0"
               onClick={onNavigateHome}
             />
           </div>
@@ -295,9 +295,8 @@ export const DriverApp = ({ onNavigateHome }) => {
                   }
                   setCurrentScreen(tab.id);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  isActive ? 'bg-orange-500 text-white shadow-sm' : 'text-purple-200 hover:text-white'
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${isActive ? 'bg-orange-500 text-white shadow-sm' : 'text-purple-200 hover:text-white'
+                  }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
@@ -311,22 +310,20 @@ export const DriverApp = ({ onNavigateHome }) => {
           {/* Availability Pill */}
           <button
             onClick={() => setCurrentScreen('availability')}
-            className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${
-              availability === 'Available'
+            className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${availability === 'Available'
                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                 : availability === 'On Trip'
-                ? 'bg-orange-500/20 text-orange-300 border-orange-500/40'
-                : 'bg-red-500/20 text-red-300 border-red-500/40'
-            }`}
+                  ? 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+                  : 'bg-red-500/20 text-red-300 border-red-500/40'
+              }`}
           >
             <span
-              className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
-                availability === 'Available'
+              className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${availability === 'Available'
                   ? 'bg-emerald-400'
                   : availability === 'On Trip'
-                  ? 'bg-orange-400'
-                  : 'bg-red-400'
-              }`}
+                    ? 'bg-orange-400'
+                    : 'bg-red-400'
+                }`}
             ></span>
             <span>{availability}</span>
           </button>
@@ -599,25 +596,22 @@ export const DriverApp = ({ onNavigateHome }) => {
             <div className="flex border-b border-slate-200 bg-white rounded-2xl p-1 gap-1 text-xs font-bold shadow-xs">
               <button
                 onClick={() => setTripsTab('upcoming')}
-                className={`flex-1 py-2.5 rounded-xl transition-all ${
-                  tripsTab === 'upcoming' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-50'
-                }`}
+                className={`flex-1 py-2.5 rounded-xl transition-all ${tripsTab === 'upcoming' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-50'
+                  }`}
               >
                 Upcoming ({upcomingTrips.length})
               </button>
               <button
                 onClick={() => setTripsTab('ongoing')}
-                className={`flex-1 py-2.5 rounded-xl transition-all ${
-                  tripsTab === 'ongoing' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-50'
-                }`}
+                className={`flex-1 py-2.5 rounded-xl transition-all ${tripsTab === 'ongoing' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-50'
+                  }`}
               >
                 Ongoing ({ongoingTrips.length})
               </button>
               <button
                 onClick={() => setTripsTab('completed')}
-                className={`flex-1 py-2.5 rounded-xl transition-all ${
-                  tripsTab === 'completed' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-50'
-                }`}
+                className={`flex-1 py-2.5 rounded-xl transition-all ${tripsTab === 'completed' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-50'
+                  }`}
               >
                 Completed ({completedTrips.length})
               </button>
@@ -813,9 +807,8 @@ export const DriverApp = ({ onNavigateHome }) => {
                             type="button"
                             key={cat}
                             onClick={() => setExpenseForm({ ...expenseForm, category: cat })}
-                            className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all ${
-                              isSel ? 'bg-orange-50 border-orange-500 text-orange-600 shadow-xs' : 'bg-white border-slate-200 text-slate-600'
-                            }`}
+                            className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all ${isSel ? 'bg-orange-50 border-orange-500 text-orange-600 shadow-xs' : 'bg-white border-slate-200 text-slate-600'
+                              }`}
                           >
                             {cat}
                           </button>
@@ -943,13 +936,12 @@ export const DriverApp = ({ onNavigateHome }) => {
                           {exp.category} • ₹{exp.amount?.toLocaleString()}
                         </span>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            exp.status === 'Approved'
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${exp.status === 'Approved'
                               ? 'bg-emerald-100 text-emerald-800'
                               : exp.status === 'Rejected'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
                         >
                           {exp.status}
                         </span>
@@ -1042,11 +1034,11 @@ export const DriverApp = ({ onNavigateHome }) => {
                     {(walletData.transactions?.length > 0
                       ? walletData.transactions
                       : [
-                          { id: 'wt-1', category: 'Trip Salary', tripId: 'TIR-2026-031', date: '03 Nov 2026', type: 'credit', amount: 18000 },
-                          { id: 'wt-2', category: 'Fuel Expense', tripId: 'TIR-2026-034', date: '02 Nov 2026', type: 'debit', amount: 3500 },
-                          { id: 'wt-3', category: 'Toll Expense', tripId: 'TIR-2026-034', date: '02 Nov 2026', type: 'debit', amount: 420 },
-                          { id: 'wt-4', category: 'Trip Salary', tripId: 'TIR-2026-030', date: '28 Oct 2026', type: 'credit', amount: 12000 },
-                        ]
+                        { id: 'wt-1', category: 'Trip Salary', tripId: 'TIR-2026-031', date: '03 Nov 2026', type: 'credit', amount: 18000 },
+                        { id: 'wt-2', category: 'Fuel Expense', tripId: 'TIR-2026-034', date: '02 Nov 2026', type: 'debit', amount: 3500 },
+                        { id: 'wt-3', category: 'Toll Expense', tripId: 'TIR-2026-034', date: '02 Nov 2026', type: 'debit', amount: 420 },
+                        { id: 'wt-4', category: 'Trip Salary', tripId: 'TIR-2026-030', date: '28 Oct 2026', type: 'credit', amount: 12000 },
+                      ]
                     ).map((tx) => (
                       <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-5 py-3.5 font-semibold text-slate-900">{tx.category}</td>
@@ -1054,9 +1046,8 @@ export const DriverApp = ({ onNavigateHome }) => {
                         <td className="px-4 py-3.5 text-slate-500">{tx.date}</td>
                         <td className="px-4 py-3.5">
                           <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              tx.type === 'credit' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                            }`}
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tx.type === 'credit' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                              }`}
                           >
                             {tx.type.toUpperCase()}
                           </span>
@@ -1104,9 +1095,8 @@ export const DriverApp = ({ onNavigateHome }) => {
                   <div
                     key={opt.id}
                     onClick={() => handleUpdateAvailability(opt.id)}
-                    className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-                      isChecked ? 'border-orange-500 bg-orange-50/50 shadow-xs' : 'border-slate-200 hover:bg-slate-50'
-                    }`}
+                    className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${isChecked ? 'border-orange-500 bg-orange-50/50 shadow-xs' : 'border-slate-200 hover:bg-slate-50'
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-base">
@@ -1118,9 +1108,8 @@ export const DriverApp = ({ onNavigateHome }) => {
                       </div>
                     </div>
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        isChecked ? 'border-orange-500 bg-orange-500' : 'border-slate-300'
-                      }`}
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isChecked ? 'border-orange-500 bg-orange-500' : 'border-slate-300'
+                        }`}
                     >
                       {isChecked && <div className="w-2 h-2 rounded-full bg-white"></div>}
                     </div>
@@ -1229,9 +1218,8 @@ export const DriverApp = ({ onNavigateHome }) => {
                 }
                 setCurrentScreen(item.id);
               }}
-              className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
-                isActive ? 'text-orange-400 font-bold' : 'text-purple-300 hover:text-white'
-              }`}
+              className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${isActive ? 'text-orange-400 font-bold' : 'text-purple-300 hover:text-white'
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span className="text-[10px]">{item.label}</span>
