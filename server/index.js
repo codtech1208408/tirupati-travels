@@ -18,16 +18,26 @@ app.use(cors());
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
-// Directories
-const DATA_DIR = path.join(__dirname, 'data');
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+// Directories & Storage
+const isVercel = Boolean(process.env.VERCEL);
+const DATA_DIR = isVercel ? '/tmp/data' : path.join(__dirname, 'data');
+const UPLOADS_DIR = isVercel ? '/tmp/uploads' : path.join(__dirname, 'uploads');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+const SEED_DB_FILE = path.join(__dirname, 'data', 'db.json');
 
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+} catch (e) {
+  // Ignored in read-only setups
+}
 
 // Serve uploads statically
 app.use('/uploads', express.static(UPLOADS_DIR));
+const STATIC_UPLOADS = path.join(__dirname, '..', 'client', 'public', 'uploads');
+if (fs.existsSync(STATIC_UPLOADS)) {
+  app.use('/uploads', express.static(STATIC_UPLOADS));
+}
 app.use('/logo.png', (req, res) => {
   const logoPath = path.join(__dirname, '..', 'client', 'public', 'logo.png');
   if (fs.existsSync(logoPath)) {
@@ -46,6 +56,9 @@ if (fs.existsSync(DIST_DIR)) {
 // Configure Multer for proof & document uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    try {
+      if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    } catch (e) {}
     cb(null, UPLOADS_DIR);
   },
   filename: (req, file, cb) => {
@@ -63,22 +76,37 @@ const upload = multer({
 function readDb() {
   try {
     if (!fs.existsSync(DB_FILE)) {
-      return {
-        users: [],
-        packages: [],
-        clients: [],
-        trips: [],
-        expenses: [],
-        walletTransactions: [],
-        activityLogs: [],
-        notifications: [],
-        inquiries: [],
-      };
+      if (fs.existsSync(SEED_DB_FILE)) {
+        try {
+          if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+          fs.copyFileSync(SEED_DB_FILE, DB_FILE);
+        } catch (copyErr) {
+          const seedContent = fs.readFileSync(SEED_DB_FILE, 'utf-8');
+          return JSON.parse(seedContent);
+        }
+      } else {
+        return {
+          users: [],
+          packages: [],
+          clients: [],
+          trips: [],
+          expenses: [],
+          walletTransactions: [],
+          activityLogs: [],
+          notifications: [],
+          inquiries: [],
+        };
+      }
     }
     const data = fs.readFileSync(DB_FILE, 'utf-8');
     return JSON.parse(data);
   } catch (err) {
     console.error('Error reading db.json:', err);
+    if (fs.existsSync(SEED_DB_FILE)) {
+      try {
+        return JSON.parse(fs.readFileSync(SEED_DB_FILE, 'utf-8'));
+      } catch (e) {}
+    }
     return {
       users: [],
       packages: [],
@@ -95,6 +123,7 @@ function readDb() {
 
 function writeDb(data) {
   try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
     return true;
   } catch (err) {
@@ -1716,12 +1745,16 @@ app.use((req, res, next) => {
   }
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`Tirupati Balaji Tours & Travels Backend Server`);
-  console.log(`Running on http://localhost:${PORT}`);
-  console.log(`Uploads serving from ${UPLOADS_DIR}`);
-  console.log(`Database active at ${DB_FILE}`);
-  console.log(`=======================================================`);
-});
+// Start Server (only when running standalone)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`Tirupati Balaji Tours & Travels Backend Server`);
+    console.log(`Running on http://localhost:${PORT}`);
+    console.log(`Uploads serving from ${UPLOADS_DIR}`);
+    console.log(`Database active at ${DB_FILE}`);
+    console.log(`=======================================================`);
+  });
+}
+
+export default app;
