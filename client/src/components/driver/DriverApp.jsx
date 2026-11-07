@@ -311,18 +311,18 @@ export const DriverApp = ({ onNavigateHome }) => {
           <button
             onClick={() => setCurrentScreen('availability')}
             className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${availability === 'Available'
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                : availability === 'On Trip'
-                  ? 'bg-orange-500/20 text-orange-300 border-orange-500/40'
-                  : 'bg-red-500/20 text-red-300 border-red-500/40'
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+              : availability === 'On Trip'
+                ? 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+                : 'bg-red-500/20 text-red-300 border-red-500/40'
               }`}
           >
             <span
               className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${availability === 'Available'
-                  ? 'bg-emerald-400'
-                  : availability === 'On Trip'
-                    ? 'bg-orange-400'
-                    : 'bg-red-400'
+                ? 'bg-emerald-400'
+                : availability === 'On Trip'
+                  ? 'bg-orange-400'
+                  : 'bg-red-400'
                 }`}
             ></span>
             <span>{availability}</span>
@@ -937,10 +937,10 @@ export const DriverApp = ({ onNavigateHome }) => {
                         </span>
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${exp.status === 'Approved'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : exp.status === 'Rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-amber-100 text-amber-800'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : exp.status === 'Rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-amber-100 text-amber-800'
                             }`}
                         >
                           {exp.status}

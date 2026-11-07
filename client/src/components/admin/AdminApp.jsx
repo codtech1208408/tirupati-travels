@@ -121,9 +121,8 @@ export const AdminApp = ({ onNavigateHome }) => {
     <div className="h-screen w-screen overflow-hidden flex bg-slate-100 font-sans">
       {/* FIXED LEFT SIDEBAR (No scrolling away, Logo removed as requested in image 2) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1e1035] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${
-          isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1e1035] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          }`}
       >
         {/* Sidebar Header - Logo removed here because it's already in the fixed top header */}
         <div className="p-4 border-b border-purple-900/50 flex items-center justify-between shrink-0">
@@ -171,17 +170,15 @@ export const AdminApp = ({ onNavigateHome }) => {
                   setActiveTab(item.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
-                  isActive
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group ${isActive
                     ? 'bg-orange-500 text-white shadow-md'
                     : 'text-purple-200 hover:bg-white/10 hover:text-white'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon
-                    className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-white' : 'text-purple-300 group-hover:text-white'
-                    }`}
+                    className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-purple-300 group-hover:text-white'
+                      }`}
                   />
                   <span>{item.label}</span>
                 </div>
@@ -199,10 +196,11 @@ export const AdminApp = ({ onNavigateHome }) => {
         <div className="p-3 border-t border-purple-900/40 space-y-1 shrink-0">
           <button
             onClick={onNavigateHome}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-purple-300 hover:bg-white/5 hover:text-white transition-colors"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-purple-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+            title="Return to Welcome / Role Selection"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Public Website</span>
+            <span>Role Selection</span>
           </button>
           <button
             onClick={logout}

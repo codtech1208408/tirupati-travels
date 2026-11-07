@@ -206,10 +206,11 @@ export const ManagerApp = ({ onNavigateHome }) => {
         <div className="p-3 border-t border-purple-900/40 space-y-1 shrink-0">
           <button
             onClick={onNavigateHome}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-purple-300 hover:bg-white/5 hover:text-white"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-purple-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+            title="Return to Welcome / Role Selection"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Public Website</span>
+            <span>Role Selection</span>
           </button>
           <button
             onClick={logout}
