@@ -3,7 +3,7 @@ import { ShieldCheck, Briefcase, Car, Sparkles, ArrowRight, Lock, UserPlus } fro
 
 export const WelcomeScreen = ({ onNavigate }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] text-white flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-orange-500 selection:text-white">
+    <div className="fixed inset-0 w-full h-full overflow-y-auto flex flex-col justify-between p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] text-white font-sans selection:bg-orange-500 selection:text-white overscroll-none">
       {/* Top Brand Header */}
       <header className="w-full max-w-3xl mx-auto pt-4 sm:pt-8 text-center">
         <div className="inline-block p-2.5 bg-white rounded-2xl shadow-2xl mb-4 border border-purple-200/20">

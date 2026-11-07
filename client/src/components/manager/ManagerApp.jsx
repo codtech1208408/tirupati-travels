@@ -79,7 +79,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
   }, [token]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex bg-slate-100 font-sans">
+    <div className="fixed inset-0 w-full h-full overflow-hidden flex bg-slate-100 font-sans overscroll-none">
       {/* FIXED LEFT SIDEBAR (No scrolling away, duplicate logo removed) */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1b1030] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
@@ -225,7 +225,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
       {/* RIGHT SIDE: FIXED HEADER & SCROLLABLE MAIN CONTENT */}
       <div className="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
         {/* FIXED HEADER: Never moves when scrolling, fully responsive on mobile */}
-        <header className="h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shrink-0 z-20 shadow-xs gap-2">
+        <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs gap-2">
           {/* Left: Mobile Menu Toggle + Company Logo + Current Tab */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button
@@ -282,7 +282,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
         </header>
 
         {/* SCROLLABLE MAIN CONTENT */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50/70">
+        <main className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50/70">
           {/* Privacy Enforcement Banner */}
           <div className="p-4 bg-purple-900 text-white rounded-2xl shadow-sm flex items-start gap-3">
             <ShieldAlert className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />

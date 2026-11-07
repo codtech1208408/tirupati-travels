@@ -255,9 +255,9 @@ export const DriverApp = ({ onNavigateHome }) => {
   const currentOngoingTrip = ongoingTrips[0] || driverTrips[0];
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-100 font-sans">
+    <div className="fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-slate-100 font-sans overscroll-none">
       {/* FIXED TOP HEADER: Never moves when scrolling, fully responsive on mobile */}
-      <header className="h-16 bg-[#1e1035] text-white px-3 sm:px-6 flex items-center justify-between shrink-0 z-30 shadow-md gap-2">
+      <header className="sticky top-0 z-30 h-16 bg-[#1e1035] text-white px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-md gap-2">
         {/* Left: Logo and App Title */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <div className="min-w-0 flex items-center overflow-hidden">
@@ -363,7 +363,7 @@ export const DriverApp = ({ onNavigateHome }) => {
       </header>
 
       {/* MAIN RESPONSIVE SCROLLABLE BODY */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto pb-20 md:pb-8">
+      <main className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto pb-20 md:pb-8">
         {/* =========================================================================
            1. DASHBOARD OVERVIEW
            ========================================================================= */}

@@ -44,8 +44,8 @@ export const ManagerRegister = ({ onNavigateLogin, onNavigateHome }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] flex items-center justify-center p-4 sm:p-6 font-sans">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40">
+    <div className="fixed inset-0 w-full h-full overflow-y-auto flex items-center justify-center p-3 sm:p-6 bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] font-sans overscroll-none">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40 my-auto shrink-0">
         {/* Header */}
         <div className="bg-[#1b1030] p-5 sm:p-6 text-white">
           {/* Top Bar with Role Selection Back Button */}

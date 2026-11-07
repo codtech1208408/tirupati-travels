@@ -70,12 +70,12 @@ export const AdminLogin = ({ onLoginSuccess, onNavigateHome, embedded = false })
       className={
         embedded
           ? 'w-full max-w-md mx-auto py-2'
-          : 'min-h-screen bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] flex items-center justify-center p-4 font-sans'
+          : 'fixed inset-0 w-full h-full overflow-hidden flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] font-sans overscroll-none'
       }
     >
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40 my-auto shrink-0 max-h-[96dvh] flex flex-col">
         {/* Top Header */}
-        <div className="bg-[#1e1035] p-5 sm:p-6 text-white">
+        <div className="bg-[#1e1035] p-5 sm:p-6 text-white shrink-0">
           {/* Top Bar with Role Selection Back Button */}
           <div className="flex items-center justify-between mb-4">
             <button
@@ -116,7 +116,7 @@ export const AdminLogin = ({ onLoginSuccess, onNavigateHome, embedded = false })
         </div>
 
         {/* Body */}
-        <div className="p-6 sm:p-8 space-y-4">
+        <div className="p-5 sm:p-8 space-y-4 overflow-y-auto">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
