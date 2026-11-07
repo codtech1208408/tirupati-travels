@@ -44,9 +44,9 @@ export const App = () => {
       return <AdminApp onNavigateHome={() => navigate('/')} />;
     } else {
       return (
-        <AdminLogin
-          onLoginSuccess={() => navigate('/admin')}
-          onNavigateHome={() => navigate('/')}
+        <WelcomeScreen
+          initialRole="admin"
+          onNavigate={(targetPath) => navigate(targetPath)}
         />
       );
     }
@@ -58,10 +58,9 @@ export const App = () => {
       return <ManagerApp onNavigateHome={() => navigate('/')} />;
     } else {
       return (
-        <ManagerLogin
-          onLoginSuccess={() => navigate('/manager')}
-          onNavigateHome={() => navigate('/')}
-          onNavigateRegister={() => navigate('/manager/register')}
+        <WelcomeScreen
+          initialRole="manager"
+          onNavigate={(targetPath) => navigate(targetPath)}
         />
       );
     }
@@ -73,10 +72,9 @@ export const App = () => {
       return <DriverApp onNavigateHome={() => navigate('/')} />;
     } else {
       return (
-        <DriverLogin
-          onLoginSuccess={() => navigate('/driver')}
-          onNavigateHome={() => navigate('/')}
-          onNavigateRegister={() => navigate('/driver/register')}
+        <WelcomeScreen
+          initialRole="driver"
+          onNavigate={(targetPath) => navigate(targetPath)}
         />
       );
     }
@@ -85,6 +83,7 @@ export const App = () => {
   // 6. DEFAULT APPLICATION ENTRY POINT: APP-STYLE WELCOME / ROLE SELECTION SCREEN (/)
   return (
     <WelcomeScreen
+      initialRole={null}
       onNavigate={(targetPath) => navigate(targetPath)}
     />
   );

@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { Smartphone, Mail, Key, AlertCircle, ArrowLeft, Sparkles, UserPlus, Car } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const DriverLogin = ({ onLoginSuccess, onNavigateHome, onNavigateRegister }) => {
+export const DriverLogin = ({
+  onLoginSuccess,
+  onNavigateHome,
+  onNavigateRegister,
+  embedded = false,
+}) => {
   const { sendOtp, verifyOtp, loginWithGoogle, quickSwitchRole } = useAuth();
   const [email, setEmail] = useState('ramesh.driver@tirupatibalaji.com');
   const [otp, setOtp] = useState('123456');
@@ -64,7 +69,13 @@ export const DriverLogin = ({ onLoginSuccess, onNavigateHome, onNavigateRegister
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1b1030] via-[#241344] to-[#120824] flex items-center justify-center p-4 sm:p-6 font-sans">
+    <div
+      className={
+        embedded
+          ? 'w-full max-w-md mx-auto py-2'
+          : 'min-h-screen bg-gradient-to-br from-[#1b1030] via-[#241344] to-[#120824] flex items-center justify-center p-4 sm:p-6 font-sans'
+      }
+    >
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40">
         {/* Top Header */}
         <div className="bg-[#1e1035] p-6 text-center text-white relative">

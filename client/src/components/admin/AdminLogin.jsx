@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Mail, Key, AlertCircle, ArrowLeft, Lock, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const AdminLogin = ({ onLoginSuccess, onNavigateHome }) => {
+export const AdminLogin = ({ onLoginSuccess, onNavigateHome, embedded = false }) => {
   const { sendOtp, verifyOtp, loginWithGoogle, quickSwitchRole } = useAuth();
   const [email, setEmail] = useState('admin@tirupatibalaji.com');
   const [otp, setOtp] = useState('123456');
@@ -66,7 +66,13 @@ export const AdminLogin = ({ onLoginSuccess, onNavigateHome }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] flex items-center justify-center p-4 font-sans">
+    <div
+      className={
+        embedded
+          ? 'w-full max-w-md mx-auto py-2'
+          : 'min-h-screen bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] flex items-center justify-center p-4 font-sans'
+      }
+    >
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40">
         {/* Top Header */}
         <div className="bg-[#1e1035] p-6 text-center text-white relative">
