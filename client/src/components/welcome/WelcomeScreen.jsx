@@ -1,214 +1,121 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Briefcase, Car, Sparkles, ArrowLeft } from 'lucide-react';
-import { AdminLogin } from '../admin/AdminLogin';
-import { ManagerLogin } from '../manager/ManagerLogin';
-import { DriverLogin } from '../driver/DriverLogin';
+import React from 'react';
+import { ShieldCheck, Briefcase, Car, Sparkles, ArrowRight, Lock, UserPlus } from 'lucide-react';
 
-export const WelcomeScreen = ({ initialRole = null, onNavigate }) => {
-  const [selectedRole, setSelectedRole] = useState(initialRole);
-
-  const handleSelectRole = (role) => {
-    if (selectedRole === role) {
-      setSelectedRole(null);
-      if (onNavigate) onNavigate('/');
-    } else {
-      setSelectedRole(role);
-      if (onNavigate) onNavigate(`/${role}`);
-    }
-  };
-
-  const handleCloseLogin = () => {
-    setSelectedRole(null);
-    if (onNavigate) onNavigate('/');
-  };
-
+export const WelcomeScreen = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#120824] via-[#1e1035] to-[#2b144d] text-white flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-orange-500 selection:text-white">
       {/* Top Brand Header */}
-      <header className="w-full max-w-3xl mx-auto pt-3 sm:pt-6 text-center">
-        <div className="inline-block p-2 bg-white rounded-2xl shadow-2xl mb-3 border border-purple-200/20">
+      <header className="w-full max-w-3xl mx-auto pt-4 sm:pt-8 text-center">
+        <div className="inline-block p-2.5 bg-white rounded-2xl shadow-2xl mb-4 border border-purple-200/20">
           <img
             src="/logo.png"
             alt="Tirupati Balaji Tours & Travels"
-            className="h-11 sm:h-14 w-auto object-contain mx-auto"
+            className="h-12 sm:h-16 w-auto object-contain mx-auto"
           />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-[11px] sm:text-xs font-bold tracking-wider uppercase mb-1.5">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-bold tracking-wider uppercase mb-2">
           <Sparkles className="w-3.5 h-3.5" />
           Fleet & Trip Management Platform
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-white tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-heading font-extrabold text-white tracking-tight">
           Welcome to <span className="text-orange-400">Tirupati Balaji</span>
         </h1>
-        <p className="text-xs sm:text-sm text-purple-200/80 mt-1 max-w-md mx-auto">
-          Select a login portal below to access your dedicated workspace
+        <p className="text-xs sm:text-sm text-purple-200/80 mt-1.5 max-w-md mx-auto">
+          Select your dedicated portal below to open the full login page
         </p>
+      </header>
 
-        {/* =========================================================================
-            THREE HEADINGS HORIZONTALLY SIDE BY SIDE IN A SINGLE ROW (EQUAL IN SIZE)
-            ========================================================================= */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl sm:max-w-3xl w-full mx-auto mt-6">
-          {/* HEADING 1: ADMIN LOGIN */}
+      {/* Main Content: THREE EQUAL OPTIONS HORIZONTALLY SIDE BY SIDE IN A SINGLE ROW */}
+      <main className="w-full max-w-3xl mx-auto my-auto py-6">
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-4 w-full">
+          {/* OPTION 1: ADMIN LOGIN */}
           <button
             type="button"
-            onClick={() => handleSelectRole('admin')}
-            className={`p-3 sm:p-4 rounded-2xl border-2 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-center sm:text-left cursor-pointer shadow-md ${
-              selectedRole === 'admin'
-                ? 'bg-orange-500 text-white border-orange-400 shadow-xl ring-2 ring-orange-400/40 scale-[1.02]'
-                : 'bg-white/95 text-slate-800 border-white/20 hover:bg-white hover:border-orange-500 hover:shadow-lg'
-            }`}
+            onClick={() => onNavigate('/admin')}
+            className="p-3 sm:p-5 rounded-2xl bg-white/95 hover:bg-white text-slate-800 shadow-xl hover:shadow-2xl hover:scale-102 border-2 border-transparent hover:border-orange-500 transition-all flex flex-col items-center justify-center gap-2 sm:gap-3 text-center cursor-pointer group"
           >
-            <div
-              className={`p-2 sm:p-2.5 rounded-xl shrink-0 transition-colors ${
-                selectedRole === 'admin'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-[#1e1035] text-orange-400'
-              }`}
-            >
-              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#1e1035] text-orange-400 group-hover:bg-orange-500 group-hover:text-white shadow-md transition-colors">
+              <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div className="min-w-0">
-              <h2 className="font-heading font-extrabold text-xs sm:text-sm md:text-base leading-tight">
+            <div>
+              <h2 className="font-heading font-extrabold text-xs sm:text-base text-slate-900 group-hover:text-orange-600 transition-colors leading-tight">
                 Admin Login
               </h2>
-              <span
-                className={`text-[10px] hidden sm:block mt-0.5 ${
-                  selectedRole === 'admin' ? 'text-orange-100' : 'text-slate-600'
-                }`}
-              >
+              <span className="text-[10px] text-slate-500 hidden sm:block mt-0.5">
                 Super Admin
               </span>
             </div>
           </button>
 
-          {/* HEADING 2: MANAGER LOGIN */}
+          {/* OPTION 2: MANAGER LOGIN */}
           <button
             type="button"
-            onClick={() => handleSelectRole('manager')}
-            className={`p-3 sm:p-4 rounded-2xl border-2 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-center sm:text-left cursor-pointer shadow-md ${
-              selectedRole === 'manager'
-                ? 'bg-purple-900 text-white border-purple-400 shadow-xl ring-2 ring-purple-400/40 scale-[1.02]'
-                : 'bg-white/95 text-slate-800 border-white/20 hover:bg-white hover:border-purple-600 hover:shadow-lg'
-            }`}
+            onClick={() => onNavigate('/manager')}
+            className="p-3 sm:p-5 rounded-2xl bg-white/95 hover:bg-white text-slate-800 shadow-xl hover:shadow-2xl hover:scale-102 border-2 border-transparent hover:border-purple-600 transition-all flex flex-col items-center justify-center gap-2 sm:gap-3 text-center cursor-pointer group"
           >
-            <div
-              className={`p-2 sm:p-2.5 rounded-xl shrink-0 transition-colors ${
-                selectedRole === 'manager'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-purple-800 text-purple-200'
-              }`}
-            >
-              <Briefcase className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-purple-900 text-purple-200 group-hover:bg-purple-950 group-hover:text-white shadow-md transition-colors">
+              <Briefcase className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div className="min-w-0">
-              <h2 className="font-heading font-extrabold text-xs sm:text-sm md:text-base leading-tight">
+            <div>
+              <h2 className="font-heading font-extrabold text-xs sm:text-base text-slate-900 group-hover:text-purple-900 transition-colors leading-tight">
                 Manager Login
               </h2>
-              <span
-                className={`text-[10px] hidden sm:block mt-0.5 ${
-                  selectedRole === 'manager' ? 'text-purple-200' : 'text-slate-600'
-                }`}
-              >
+              <span className="text-[10px] text-slate-500 hidden sm:block mt-0.5">
                 Operations
               </span>
             </div>
           </button>
 
-          {/* HEADING 3: DRIVER LOGIN */}
+          {/* OPTION 3: DRIVER LOGIN */}
           <button
             type="button"
-            onClick={() => handleSelectRole('driver')}
-            className={`p-3 sm:p-4 rounded-2xl border-2 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-center sm:text-left cursor-pointer shadow-md ${
-              selectedRole === 'driver'
-                ? 'bg-orange-500 text-white border-orange-400 shadow-xl ring-2 ring-orange-400/40 scale-[1.02]'
-                : 'bg-white/95 text-slate-800 border-white/20 hover:bg-white hover:border-orange-500 hover:shadow-lg'
-            }`}
+            onClick={() => onNavigate('/driver')}
+            className="p-3 sm:p-5 rounded-2xl bg-white/95 hover:bg-white text-slate-800 shadow-xl hover:shadow-2xl hover:scale-102 border-2 border-transparent hover:border-orange-500 transition-all flex flex-col items-center justify-center gap-2 sm:gap-3 text-center cursor-pointer group"
           >
-            <div
-              className={`p-2 sm:p-2.5 rounded-xl shrink-0 transition-colors ${
-                selectedRole === 'driver'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-orange-500 text-white'
-              }`}
-            >
-              <Car className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-orange-500 text-white group-hover:bg-orange-600 shadow-md transition-colors">
+              <Car className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div className="min-w-0">
-              <h2 className="font-heading font-extrabold text-xs sm:text-sm md:text-base leading-tight">
+            <div>
+              <h2 className="font-heading font-extrabold text-xs sm:text-base text-slate-900 group-hover:text-orange-600 transition-colors leading-tight">
                 Driver Login
               </h2>
-              <span
-                className={`text-[10px] hidden sm:block mt-0.5 ${
-                  selectedRole === 'driver' ? 'text-orange-100' : 'text-slate-600'
-                }`}
-              >
+              <span className="text-[10px] text-slate-500 hidden sm:block mt-0.5">
                 Fleet Pilot
               </span>
             </div>
           </button>
         </div>
-      </header>
 
-      {/* =========================================================================
-          CONDITIONAL LOGIN PAGE: SHOWN ONLY AFTER SELECTING A PARTICULAR LOGIN
-          ========================================================================= */}
-      <main className="w-full max-w-xl mx-auto my-auto py-4">
-        {selectedRole === null ? (
-          /* Initial State: Only headings are displayed with a simple guidance note */
-          <div className="text-center py-8 sm:py-12 animate-in fade-in duration-300">
-            <div className="inline-block p-4 rounded-full bg-white/5 border border-white/10 mb-3 text-orange-400">
-              <Sparkles className="w-6 h-6 mx-auto animate-pulse" />
-            </div>
-            <p className="text-xs sm:text-sm text-purple-200/70 font-medium">
-              Tap any login heading above to open that portal
-            </p>
+        {/* Quick Helper Note & Registration Shortcuts */}
+        <div className="mt-8 text-center space-y-3">
+          <p className="text-xs text-purple-200/70 font-medium">
+            Click any login heading above to open that full login page
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-purple-200/90 pt-2">
+            <button
+              onClick={() => onNavigate('/manager/register')}
+              className="hover:text-orange-400 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-orange-400" />
+              <span>Request Manager Access</span>
+            </button>
+            <span className="text-purple-400/40">•</span>
+            <button
+              onClick={() => onNavigate('/driver/register')}
+              className="hover:text-orange-400 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-orange-400" />
+              <span>New Driver Registration</span>
+            </button>
           </div>
-        ) : selectedRole === 'admin' ? (
-          /* Admin Login Page */
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-200">
-            <AdminLogin
-              embedded={true}
-              onLoginSuccess={() => {
-                if (onNavigate) onNavigate('/admin');
-              }}
-              onNavigateHome={handleCloseLogin}
-            />
-          </div>
-        ) : selectedRole === 'manager' ? (
-          /* Manager Login Page */
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-200">
-            <ManagerLogin
-              embedded={true}
-              onLoginSuccess={() => {
-                if (onNavigate) onNavigate('/manager');
-              }}
-              onNavigateHome={handleCloseLogin}
-              onNavigateRegister={() => {
-                if (onNavigate) onNavigate('/manager/register');
-              }}
-            />
-          </div>
-        ) : selectedRole === 'driver' ? (
-          /* Driver Login Page */
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-200">
-            <DriverLogin
-              embedded={true}
-              onLoginSuccess={() => {
-                if (onNavigate) onNavigate('/driver');
-              }}
-              onNavigateHome={handleCloseLogin}
-              onNavigateRegister={() => {
-                if (onNavigate) onNavigate('/driver/register');
-              }}
-            />
-          </div>
-        ) : null}
+        </div>
       </main>
 
       {/* Bottom Footer */}
-      <footer className="w-full max-w-3xl mx-auto pb-3 text-center">
+      <footer className="w-full max-w-3xl mx-auto pb-4 text-center">
         <p className="text-[11px] text-purple-300/60 font-medium">
           Tirupati Balaji Tours & Travels • Official Fleet Trip Management Suite
         </p>
