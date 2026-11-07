@@ -341,3 +341,4 @@ export const DriverRegister = ({ onNavigateLogin, onNavigateHome }) => {
     </div>
   );
 };
+

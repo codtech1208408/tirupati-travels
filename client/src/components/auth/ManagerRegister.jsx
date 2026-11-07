@@ -230,3 +230,4 @@ export const ManagerRegister = ({ onNavigateLogin, onNavigateHome }) => {
     </div>
   );
 };
+
