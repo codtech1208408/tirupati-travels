@@ -75,31 +75,44 @@ export const AdminLogin = ({ onLoginSuccess, onNavigateHome, embedded = false })
     >
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-900/40">
         {/* Top Header */}
-        <div className="bg-[#1e1035] p-6 text-center text-white relative">
-          <button
-            onClick={onNavigateHome}
-            className="absolute top-4 left-4 p-2 rounded-xl bg-white/10 text-purple-200 hover:text-white hover:bg-white/20 transition-colors flex items-center gap-1.5 text-xs cursor-pointer"
-            title="Return to Role Selection"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Role Selection</span>
-          </button>
-
-          <img
-            src="/logo.png"
-            alt="Tirupati Balaji Tours & Travels"
-            className="h-11 sm:h-12 w-auto mx-auto bg-white p-1 rounded-lg object-contain shadow-md mb-2.5"
-          />
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold border border-orange-500/30">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            ADMINISTRATOR PORTAL
+        <div className="bg-[#1e1035] p-5 sm:p-6 text-white">
+          {/* Top Bar with Role Selection Back Button */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={onNavigateHome}
+              className="px-2.5 py-1.5 rounded-xl bg-white/10 text-purple-200 hover:text-white hover:bg-white/20 transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+              title="Return to Role Selection"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Role Selection</span>
+            </button>
+            <span className="text-[10px] text-purple-300/60 font-bold uppercase tracking-wider">
+              Secure Access
+            </span>
           </div>
-          <h2 className="font-heading font-extrabold text-xl text-white mt-1.5">
-            Admin Suite Login
-          </h2>
-          <p className="text-xs text-purple-200/80 mt-1">
-            Enterprise fleet dispatch, client privacy & financial controls
-          </p>
+
+          {/* Centered Logo - 100% free of button overlap */}
+          <div className="flex justify-center mb-3">
+            <img
+              src="/logo.png"
+              alt="Tirupati Balaji Tours & Travels"
+              className="h-11 sm:h-12 w-auto bg-white p-1 rounded-lg object-contain shadow-md"
+            />
+          </div>
+
+          <div className="text-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold border border-orange-500/30">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              ADMINISTRATOR PORTAL
+            </div>
+            <h2 className="font-heading font-extrabold text-xl text-white mt-1.5">
+              Admin Suite Login
+            </h2>
+            <p className="text-xs text-purple-200/80 mt-1">
+              Enterprise fleet dispatch, client privacy & financial controls
+            </p>
+          </div>
         </div>
 
         {/* Body */}
