@@ -1010,23 +1010,23 @@ export const DriverApp = ({ onNavigateHome }) => {
                     </div>
                   </div>
 
-                  {/* Paid By Selection (Who Paid for this Expense?) */}
+                  {/* Paid By Selection */}
                   <div className="space-y-1.5">
                     <label className="block font-semibold text-slate-700 text-xs">
-                      Paid By (Who Paid?) *
+                      Paid By
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <button
                         type="button"
                         onClick={() => setExpenseForm({ ...expenseForm, paidBy: 'driver' })}
-                        className={`p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
+                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                           (expenseForm.paidBy || 'driver') === 'driver'
                             ? 'bg-orange-50/80 border-orange-500 text-orange-950 ring-2 ring-orange-500/20 shadow-xs'
                             : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                             (expenseForm.paidBy || 'driver') === 'driver'
                               ? 'border-orange-600 bg-orange-600'
                               : 'border-slate-300'
@@ -1036,27 +1036,22 @@ export const DriverApp = ({ onNavigateHome }) => {
                             <div className="w-1.5 h-1.5 rounded-full bg-white" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-bold text-xs flex items-center gap-1">
-                            🚗 Paid by Driver
-                          </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">
-                            Driver paid out of pocket. Added to driver's salary payout in admin panel.
-                          </p>
-                        </div>
+                        <p className="font-bold text-xs flex items-center gap-1">
+                          🚗 Paid by Driver
+                        </p>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setExpenseForm({ ...expenseForm, paidBy: 'passenger' })}
-                        className={`p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
+                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                           expenseForm.paidBy === 'passenger'
                             ? 'bg-blue-50/80 border-blue-500 text-blue-950 ring-2 ring-blue-500/20 shadow-xs'
                             : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                             expenseForm.paidBy === 'passenger'
                               ? 'border-blue-600 bg-blue-600'
                               : 'border-slate-300'
@@ -1066,14 +1061,9 @@ export const DriverApp = ({ onNavigateHome }) => {
                             <div className="w-1.5 h-1.5 rounded-full bg-white" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-bold text-xs flex items-center gap-1">
-                            👤 Paid by Passenger
-                          </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">
-                            Passenger paid on road. Deducted from client trip package balance.
-                          </p>
-                        </div>
+                        <p className="font-bold text-xs flex items-center gap-1">
+                          👤 Paid by Passenger
+                        </p>
                       </button>
                     </div>
                   </div>
