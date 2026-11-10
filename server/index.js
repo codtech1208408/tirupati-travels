@@ -1210,6 +1210,50 @@ app.put('/api/trips/:id/status', authenticateToken, (req, res) => {
    6. SALARY MANAGEMENT, CLOSING DEALS & DRIVER WALLET
    ========================================================================== */
 
+// PUT /api/trips/:id/salary (Add / Update salary for completed trip)
+app.put('/api/trips/:id/salary', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Admin or Manager access required' });
+  }
+
+  const { salary, amount, notes } = req.body;
+  const numSalary = Number(salary);
+  if (isNaN(numSalary) || numSalary < 0) {
+    return res.status(400).json({ error: 'Please enter a valid salary amount' });
+  }
+
+  const db = readDb();
+  const tripIdx = db.trips.findIndex((t) => t.id === req.params.id);
+  if (tripIdx === -1) return res.status(404).json({ error: 'Trip not found' });
+
+  const trip = db.trips[tripIdx];
+  trip.salary = numSalary;
+  if (amount !== undefined && !isNaN(Number(amount))) {
+    trip.amount = Number(amount);
+  }
+  if (notes) trip.salaryNotes = notes;
+  if (!trip.salaryStatus) {
+    trip.salaryStatus = 'Pending';
+  }
+
+  db.trips[tripIdx] = trip;
+  writeDb(db);
+
+  logActivity(
+    req.user.id,
+    req.user.name,
+    req.user.role,
+    'SALARY_ASSIGNED',
+    `Assigned ₹${numSalary.toLocaleString()} salary for completed trip ${trip.id}`
+  );
+
+  res.json({
+    success: true,
+    message: `Salary of ₹${numSalary.toLocaleString()} assigned to trip ${trip.id}!`,
+    trip: sanitizeTripForRole(trip, req.user.role),
+  });
+});
+
 // POST /api/trips/:id/close-deal
 app.post('/api/trips/:id/close-deal', authenticateToken, (req, res) => {
   // Only Admin or explicitly permitted Manager

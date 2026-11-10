@@ -546,7 +546,7 @@ export const TripManagement = ({
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${trip.status === 'Ongoing'
                             ? 'bg-orange-100 text-orange-800 border border-orange-200'
                             : trip.status === 'Completed'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              ? 'bg-blue-100 text-blue-900 border border-blue-200 shadow-xs'
                               : trip.status === 'Closed'
                                 ? 'bg-purple-100 text-purple-900 border border-purple-200'
                                 : trip.status === 'Cancelled'
@@ -568,33 +568,58 @@ export const TripManagement = ({
                         ></span>
                         {trip.status}
                       </span>
+                      {trip.status === 'Completed' && trip.endedAt && (
+                        <span className="text-[10px] text-blue-700 font-semibold block mt-0.5">
+                          ✓ Driver Ended
+                        </span>
+                      )}
                     </td>
 
                     <td className="px-4 py-3.5">
-                      <div>
-                        <span className="font-heading font-bold text-slate-900 text-xs block">
-                          ₹{(trip.salary || 0).toLocaleString()}
+                      {trip.status === 'Completed' || trip.status === 'Closed' ? (
+                        <div>
+                          {Number(trip.salary) > 0 ? (
+                            <div>
+                              <span className="font-heading font-bold text-slate-900 text-xs block">
+                                ₹{(trip.salary || 0).toLocaleString()}
+                              </span>
+                              <span
+                                className={`text-[10px] font-bold uppercase ${trip.salaryStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'
+                                  }`}
+                              >
+                                {trip.salaryStatus || 'Pending'}
+                              </span>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setClosingTrip(trip)}
+                              className="px-2.5 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-[11px] flex items-center gap-1 border border-orange-300 shadow-xs cursor-pointer animate-pulse"
+                              title="Trip completed by driver! Click to add salary"
+                            >
+                              <Plus className="w-3.5 h-3.5 text-orange-600" />
+                              <span>+ Add Salary</span>
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-slate-400 italic block">
+                          ⏳ Assigned upon completion
                         </span>
-                        <span
-                          className={`text-[10px] font-bold uppercase ${trip.salaryStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'
-                            }`}
-                        >
-                          {trip.salaryStatus || 'Pending'}
-                        </span>
-                      </div>
+                      )}
                     </td>
 
                     <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        {/* Close Project Button for Completed Trips */}
+                        {/* Option to Add Salary / Close Project for Completed Trips */}
                         {trip.status === 'Completed' && (
                           <button
                             onClick={() => setClosingTrip(trip)}
                             className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm flex items-center gap-1.5 cursor-pointer animate-pulse"
-                            title="Trip is completed! Assign salary and close project"
+                            title="Trip submitted as completed! Add driver salary and settle project"
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Close Project</span>
+                            <DollarSign className="w-3.5 h-3.5" />
+                            <span>{Number(trip.salary) > 0 ? 'Edit Salary / Settle' : '+ Add Salary'}</span>
                           </button>
                         )}
 
@@ -1019,6 +1044,29 @@ export const TripManagement = ({
                   <strong>Instructions:</strong> {selectedTripDetails.instructions || 'Standard'}
                 </p>
               </div>
+
+              {/* If trip is completed, provide button to add salary */}
+              {selectedTripDetails.status === 'Completed' && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between gap-2 text-xs">
+                  <div>
+                    <span className="font-bold text-blue-900 block">Trip Completed by Pilot</span>
+                    <span className="text-[11px] text-blue-700">
+                      Ended: {selectedTripDetails.endedAt ? new Date(selectedTripDetails.endedAt).toLocaleString() : 'Recently'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const tripToClose = selectedTripDetails;
+                      setSelectedTripDetails(null);
+                      setClosingTrip(tripToClose);
+                    }}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 shrink-0 cursor-pointer animate-pulse"
+                  >
+                    <DollarSign className="w-3.5 h-3.5" />
+                    <span>{Number(selectedTripDetails.salary) > 0 ? 'Edit Salary / Settle' : '+ Add Driver Salary'}</span>
+                  </button>
+                </div>
+              )}
 
               {/* Status Actions */}
               <div className="pt-2">

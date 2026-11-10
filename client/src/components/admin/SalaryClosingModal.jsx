@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
-  const [salary, setSalary] = useState(trip?.salary || 18000);
+  const [salary, setSalary] = useState(trip?.salary || '');
   const [amount, setAmount] = useState(trip?.amount || 25000);
   const [closeNotes, setCloseNotes] = useState('');
   const [expenses, setExpenses] = useState([]);
@@ -21,7 +21,7 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
 
   useEffect(() => {
     if (trip) {
-      setSalary(trip.salary || 18000);
+      setSalary(trip.salary !== undefined && trip.salary !== null ? trip.salary : '');
       setAmount(trip.amount || 25000);
       // Fetch expenses for this trip
       const token = localStorage.getItem('tb_token');
@@ -43,6 +43,38 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
   const numSalary = Number(salary) || 0;
   const numAmount = Number(amount) || 0;
   const totalCreditToWallet = numSalary; // Trip salary to credit
+
+  const handleSaveSalaryOnly = async () => {
+    if (numSalary <= 0) {
+      setError('Please enter a valid driver salary amount.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem('tb_token');
+    try {
+      const res = await fetch(`/api/trips/${trip.id}/salary`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          salary: numSalary,
+          amount: numAmount,
+          notes: closeNotes,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save salary');
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCloseDeal = async (e) => {
     e.preventDefault();
@@ -224,22 +256,33 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Actions */}
-          <div className="pt-2 flex justify-end gap-2.5">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 cursor-pointer"
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
-            >
-              <CheckCircle2 className="w-4 h-4 text-white" />
-              <span>{loading ? 'Closing Project...' : 'Assign Salary & Close Project'}</span>
-            </button>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={handleSaveSalaryOnly}
+                disabled={loading}
+                className="flex-1 sm:flex-none px-4 py-2.5 bg-orange-100 hover:bg-orange-200 text-orange-800 border border-orange-300 font-bold rounded-xl text-xs shadow-xs disabled:opacity-50 cursor-pointer"
+                title="Save driver salary as pending due"
+              >
+                {loading ? 'Saving...' : 'Save Salary (Due)'}
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <CheckCircle2 className="w-4 h-4 text-white" />
+                <span>{loading ? 'Closing...' : 'Assign Salary & Settle'}</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
