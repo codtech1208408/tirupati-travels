@@ -164,6 +164,13 @@ export const CreateTripView = ({
     setSuccessMessage('');
   };
 
+  const handleCancel = () => {
+    handleReset();
+    if (onNavigate) {
+      onNavigate('trips');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setDateClashError('');
@@ -558,7 +565,7 @@ export const CreateTripView = ({
           <div className="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={handleReset}
+              onClick={handleCancel}
               className="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
             >
               Cancel
