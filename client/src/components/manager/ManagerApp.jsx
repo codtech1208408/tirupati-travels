@@ -248,8 +248,18 @@ export const ManagerApp = ({ onNavigateHome }) => {
       <div className="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
         {/* FIXED HEADER: Never moves when scrolling, fully responsive on mobile */}
         <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs gap-2">
-          {/* Left: Mobile Menu Toggle + Company Logo + Current Tab */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          {/* Left: Back button + Mobile Menu Toggle + Company Logo + Current Tab */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+            <button
+              type="button"
+              onClick={onNavigateHome}
+              className="px-2 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-purple-50 hover:border-purple-200 text-slate-700 hover:text-purple-700 transition-all shrink-0 cursor-pointer flex items-center gap-1"
+              title="Return to Role Selection"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-purple-600" />
+              <span className="text-xs font-bold hidden sm:inline">Roles</span>
+            </button>
+
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="lg:hidden p-1.5 sm:p-2 rounded-lg text-slate-600 hover:bg-slate-100 shrink-0"
@@ -305,6 +315,20 @@ export const ManagerApp = ({ onNavigateHome }) => {
 
         {/* SCROLLABLE MAIN CONTENT */}
         <main className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50/70">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={onNavigateHome}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-purple-700 hover:border-purple-300 text-xs font-semibold shadow-xs transition-all cursor-pointer group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-purple-600" />
+              <span>Back to Role Selection</span>
+            </button>
+            <span className="text-[11px] text-slate-400 font-medium capitalize">
+              Manager Panel &bull; {activeTab.replace('_', ' ')}
+            </span>
+          </div>
+
           {/* Privacy Enforcement Banner */}
           <div className="p-4 bg-purple-900 text-white rounded-2xl shadow-sm flex items-start gap-3">
             <ShieldAlert className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />

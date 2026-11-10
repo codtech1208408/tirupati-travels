@@ -258,8 +258,30 @@ export const DriverApp = ({ onNavigateHome }) => {
     <div className="fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-slate-100 font-sans overscroll-none">
       {/* FIXED TOP HEADER: Never moves when scrolling, fully responsive on mobile */}
       <header className="sticky top-0 z-30 h-16 bg-[#1e1035] text-white px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-md gap-2">
-        {/* Left: Logo and App Title */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        {/* Left: Back button + Logo and App Title */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+          {currentScreen !== 'dashboard' ? (
+            <button
+              type="button"
+              onClick={() => setCurrentScreen('dashboard')}
+              className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-200 hover:text-white transition-all shrink-0 cursor-pointer flex items-center gap-1"
+              title="Back to Dashboard"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-orange-400" />
+              <span className="text-xs font-bold hidden sm:inline">Back</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onNavigateHome}
+              className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-200 hover:text-white transition-all shrink-0 cursor-pointer flex items-center gap-1"
+              title="Return to Role Selection"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-orange-400" />
+              <span className="text-xs font-bold hidden sm:inline">Roles</span>
+            </button>
+          )}
+
           <div className="min-w-0 flex items-center overflow-hidden">
             <img
               src="/logo.png"
@@ -364,6 +386,22 @@ export const DriverApp = ({ onNavigateHome }) => {
 
       {/* MAIN RESPONSIVE SCROLLABLE BODY */}
       <main className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto pb-20 md:pb-8">
+        {currentScreen !== 'dashboard' && (
+          <div className="mb-4 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setCurrentScreen('dashboard')}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-orange-600 hover:border-orange-300 text-xs font-semibold shadow-xs transition-all cursor-pointer group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-orange-500" />
+              <span>Back to Dashboard</span>
+            </button>
+            <span className="text-[11px] text-slate-500 font-medium capitalize">
+              Driver Terminal &bull; {currentScreen.replace('_', ' ')}
+            </span>
+          </div>
+        )}
+
         {/* =========================================================================
            1. DASHBOARD OVERVIEW
            ========================================================================= */}
