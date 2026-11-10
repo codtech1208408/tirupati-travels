@@ -251,9 +251,18 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
                   </td>
 
                   <td className="px-4 py-3.5">
-                    <span className="font-heading font-extrabold text-sm text-slate-900">
+                    <span className="font-heading font-extrabold text-sm text-slate-900 block">
                       ₹{exp.amount?.toLocaleString()}
                     </span>
+                    {exp.paidBy === 'passenger' ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-md bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-bold">
+                        👤 Paid by Passenger
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+                        🚗 Paid by Driver
+                      </span>
+                    )}
                   </td>
 
                   <td className="px-4 py-3.5">
@@ -344,6 +353,28 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
             </div>
 
             <form onSubmit={handleSaveReview} className="p-6 space-y-4 text-xs">
+              <div
+                className={`p-3 rounded-xl border flex items-center justify-between ${
+                  reviewModalExpense.paidBy === 'passenger'
+                    ? 'bg-blue-50 border-blue-200 text-blue-900'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                }`}
+              >
+                <div>
+                  <span className="font-bold block text-xs">
+                    {reviewModalExpense.paidBy === 'passenger' ? '👤 Paid by Passenger' : '🚗 Paid by Driver'}
+                  </span>
+                  <span className="text-[11px] opacity-80 block mt-0.5">
+                    {reviewModalExpense.paidBy === 'passenger'
+                      ? 'Deducted from client trip package bill balance.'
+                      : 'Added to driver salary payout during settlement.'}
+                  </span>
+                </div>
+                <span className="font-heading font-extrabold text-base">
+                  ₹{Number(reviewModalExpense.amount || 0).toLocaleString()}
+                </span>
+              </div>
+
               <div>
                 <label className="block font-semibold text-slate-700 mb-2">Set Review Status</label>
                 <div className="grid grid-cols-3 gap-2">

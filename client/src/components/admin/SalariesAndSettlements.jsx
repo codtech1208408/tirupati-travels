@@ -19,7 +19,7 @@ import {
   Check,
 } from 'lucide-react';
 
-export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, role = 'admin' }) => {
+export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = [], onRefresh, role = 'admin' }) => {
   const [selectedDriverId, setSelectedDriverId] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'due' | 'paid'
   const [search, setSearch] = useState('');
@@ -35,30 +35,49 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
     (t) => t.status === 'Completed' || t.status === 'Closed' || t.status === 'Ongoing'
   );
 
+  // Helper functions for expenses
+  const getTripDriverExp = (tripId) => {
+    return (expenses || [])
+      .filter((e) => e.tripId === tripId && (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected')
+      .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  };
+
+  const getTripPassengerExp = (tripId) => {
+    return (expenses || [])
+      .filter((e) => e.tripId === tripId && e.paidBy === 'passenger' && e.status !== 'Rejected')
+      .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  };
+
   // Overall Financial Calculations
-  const totalSalariesEarned = relevantTrips.reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+  const totalSalariesEarned = relevantTrips.reduce((sum, t) => sum + (Number(t.salary) || 0) + getTripDriverExp(t.id), 0);
   const totalSalariesPaid = relevantTrips
     .filter((t) => t.salaryStatus === 'Paid')
-    .reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+    .reduce((sum, t) => sum + (Number(t.salary) || 0) + getTripDriverExp(t.id), 0);
   const totalOutstandingDues = relevantTrips
     .filter((t) => t.salaryStatus !== 'Paid' && (Number(t.salary) > 0))
-    .reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+    .reduce((sum, t) => sum + (Number(t.salary) || 0) + getTripDriverExp(t.id), 0);
 
   // Calculate Driver-wise Stats
   const driverStats = drivers.map((driver) => {
     const driverTrips = relevantTrips.filter((t) => t.driverId === driver.id);
     const tripsDone = driverTrips.length;
-    const salaryEarned = driverTrips.reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+    const baseSalaryEarned = driverTrips.reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+    const driverExpTotal = driverTrips.reduce((sum, t) => sum + getTripDriverExp(t.id), 0);
+    const salaryEarned = baseSalaryEarned + driverExpTotal;
+
     const salaryPaid = driverTrips
       .filter((t) => t.salaryStatus === 'Paid')
-      .reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+      .reduce((sum, t) => sum + (Number(t.salary) || 0) + getTripDriverExp(t.id), 0);
+
     const duesPending = driverTrips
       .filter((t) => t.salaryStatus !== 'Paid' && (Number(t.salary) > 0))
-      .reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+      .reduce((sum, t) => sum + (Number(t.salary) || 0) + getTripDriverExp(t.id), 0);
 
     return {
       ...driver,
       tripsDone,
+      baseSalaryEarned,
+      driverExpTotal,
       salaryEarned,
       salaryPaid,
       duesPending,
@@ -540,6 +559,11 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                 displayTrips.map((trip) => {
                   const isPaid = trip.salaryStatus === 'Paid';
                   const salary = Number(trip.salary) || 0;
+                  const driverExp = getTripDriverExp(trip.id);
+                  const passengerExp = getTripPassengerExp(trip.id);
+                  const totalPayout = salary + driverExp;
+                  const originalTripAmount = Number(trip.amount) || 0;
+                  const remainingClientBalance = Math.max(0, originalTripAmount - passengerExp);
 
                   return (
                     <tr key={trip.id} className="hover:bg-slate-50/80 transition-colors">
@@ -553,6 +577,16 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                           <span>•</span>
                           <span className="truncate max-w-xs">{trip.route}</span>
                         </div>
+                        {passengerExp > 0 && (
+                          <div className="mt-1.5 inline-flex flex-col items-start gap-0.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-md">
+                            <span className="text-[10px] font-bold text-blue-700 flex items-center gap-1">
+                              👤 Paid by Passenger: ₹{passengerExp.toLocaleString()}
+                            </span>
+                            <span className="text-[9px] text-blue-600">
+                              Client Balance: ₹{remainingClientBalance.toLocaleString()} (₹{originalTripAmount.toLocaleString()} - ₹{passengerExp.toLocaleString()})
+                            </span>
+                          </div>
+                        )}
                       </td>
 
                       {/* Driver */}
@@ -618,9 +652,16 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                       {/* Trip Salary */}
                       <td className="px-4 py-3.5">
                         <span className="font-heading font-extrabold text-sm text-slate-900 block">
-                          ₹{salary.toLocaleString()}
+                          ₹{totalPayout.toLocaleString()}
                         </span>
-                        <span className="text-[10px] text-slate-400">Allocated Salary</span>
+                        <div className="text-[10px] text-slate-500 flex flex-col gap-0.5 mt-0.5">
+                          <span>Base Salary: ₹{salary.toLocaleString()}</span>
+                          {driverExp > 0 && (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block">
+                              🚗 +₹{driverExp.toLocaleString()} (Paid by Driver)
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Due / Payment Status */}
@@ -644,7 +685,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                               <span>Due (Pending)</span>
                             </span>
                             <span className="text-[10px] text-amber-600 font-semibold block mt-0.5">
-                              ₹{salary.toLocaleString()} awaiting payout
+                              ₹{totalPayout.toLocaleString()} awaiting payout
                             </span>
                           </div>
                         )}
@@ -663,7 +704,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                             className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer inline-flex items-center gap-1"
                           >
                             <CreditCard className="w-3.5 h-3.5" />
-                            <span>Settle Due</span>
+                            <span>Settle ₹{totalPayout.toLocaleString()}</span>
                           </button>
                         ) : (
                           <span className="text-[11px] text-amber-600 font-semibold">
@@ -701,14 +742,42 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
             </div>
 
             <form onSubmit={handleSettleTripSalary} className="p-5 space-y-4">
-              <div className="p-3.5 bg-orange-50 rounded-xl border border-orange-200">
+              <div className="p-3.5 bg-orange-50 rounded-xl border border-orange-200 space-y-2">
                 <p className="text-xs text-slate-600 font-medium">Trip: <strong>{settlingTrip.name}</strong> ({settlingTrip.id})</p>
-                <p className="text-xs text-slate-600 mt-1">Pilot: <strong>{settlingTrip.driverName}</strong></p>
-                <div className="mt-2.5 pt-2 border-t border-orange-200 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-700">Salary Due Amount:</span>
-                  <span className="font-heading font-extrabold text-lg text-orange-600">
-                    ₹{(Number(settlingTrip.salary) || 0).toLocaleString()}
-                  </span>
+                <p className="text-xs text-slate-600">Pilot: <strong>{settlingTrip.driverName}</strong></p>
+
+                <div className="pt-2 border-t border-orange-200 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-slate-600">
+                    <span>Base Trip Salary:</span>
+                    <span className="font-bold">₹{(Number(settlingTrip.salary) || 0).toLocaleString()}</span>
+                  </div>
+
+                  {getTripDriverExp(settlingTrip.id) > 0 && (
+                    <div className="flex items-center justify-between text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 font-semibold">
+                      <span>🚗 Driver Out-of-Pocket Expenses:</span>
+                      <span>+₹{getTripDriverExp(settlingTrip.id).toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  {getTripPassengerExp(settlingTrip.id) > 0 && (
+                    <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs space-y-0.5">
+                      <div className="flex items-center justify-between text-blue-800 font-bold">
+                        <span>👤 Paid on Road by Passenger:</span>
+                        <span>₹{getTripPassengerExp(settlingTrip.id).toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-blue-600">
+                        <span>Remaining to Collect from Client:</span>
+                        <span className="font-bold">₹{Math.max(0, (Number(settlingTrip.amount) || 0) - getTripPassengerExp(settlingTrip.id)).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-orange-200 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-700">Total Driver Remuneration:</span>
+                    <span className="font-heading font-extrabold text-lg text-orange-600">
+                      ₹{((Number(settlingTrip.salary) || 0) + getTripDriverExp(settlingTrip.id)).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -789,6 +858,11 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                 <p className="font-heading font-extrabold text-3xl text-emerald-800 mt-1">
                   ₹{bulkSettlingDriver.duesPending.toLocaleString()}
                 </p>
+                {bulkSettlingDriver.driverExpTotal > 0 && (
+                  <p className="text-[11px] text-emerald-700 font-semibold mt-1">
+                    (Includes ₹{bulkSettlingDriver.driverExpTotal.toLocaleString()} Driver Out-of-Pocket Expenses)
+                  </p>
+                )}
                 <p className="text-[11px] text-emerald-700 mt-1">
                   Will clear and mark all pending trip salaries as Paid
                 </p>

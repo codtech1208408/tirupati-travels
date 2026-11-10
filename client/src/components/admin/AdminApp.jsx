@@ -323,6 +323,7 @@ export const AdminApp = ({ onNavigateHome }) => {
               clients={clients}
               drivers={users.filter((u) => u.role === 'driver')}
               vehicles={vehicles}
+              expenses={expenses}
               onRefresh={fetchData}
               role="admin"
             />
@@ -346,6 +347,7 @@ export const AdminApp = ({ onNavigateHome }) => {
             <SalariesAndSettlements
               trips={trips}
               drivers={users.filter((u) => u.role === 'driver')}
+              expenses={expenses}
               onRefresh={fetchData}
               role="admin"
             />

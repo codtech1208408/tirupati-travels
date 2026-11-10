@@ -306,6 +306,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
               clients={[]}
               drivers={drivers}
               vehicles={vehicles}
+              expenses={expenses}
               onRefresh={fetchData}
               role="manager"
             />
@@ -341,6 +342,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
             <SalariesAndSettlements
               trips={trips}
               drivers={drivers}
+              expenses={expenses}
               onRefresh={fetchData}
               role="manager"
             />

@@ -28,6 +28,7 @@ export const TripManagement = ({
   clients = [],
   drivers = [],
   vehicles = [],
+  expenses = [],
   onRefresh,
   role = 'admin',
   initialOpenAdd = false,
@@ -467,6 +468,13 @@ export const TripManagement = ({
                 const isClosed = trip.status === 'Closed';
                 const clientDisplayName = trip.clientName || trip.client?.name;
                 const clientDisplayMobile = trip.clientMobile || trip.client?.phone;
+                const tripPassengerExp = (expenses || [])
+                  .filter((e) => e.tripId === trip.id && e.paidBy === 'passenger' && e.status !== 'Rejected')
+                  .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+                const tripDriverExp = (expenses || [])
+                  .filter((e) => e.tripId === trip.id && (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected')
+                  .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
                 return (
                   <tr key={trip.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-5 py-3.5">
@@ -484,6 +492,11 @@ export const TripManagement = ({
                         </div>
                         <p className="font-semibold text-slate-800 text-xs mt-0.5">{trip.name}</p>
                         <p className="text-[11px] text-slate-500 truncate max-w-xs">{trip.route}</p>
+                        {tripPassengerExp > 0 && (
+                          <span className="text-[10px] bg-blue-50 text-blue-800 border border-blue-200 px-1.5 py-0.5 rounded-sm font-bold block mt-1">
+                            👤 Paid by Passenger: ₹{tripPassengerExp.toLocaleString()} (Bal: ₹{Math.max(0, (Number(trip.amount) || 0) - tripPassengerExp).toLocaleString()})
+                          </span>
+                        )}
                       </div>
                     </td>
 
@@ -581,10 +594,18 @@ export const TripManagement = ({
                           {Number(trip.salary) > 0 ? (
                             <div>
                               <span className="font-heading font-bold text-slate-900 text-xs block">
-                                ₹{(trip.salary || 0).toLocaleString()}
+                                ₹{(Number(trip.salary) + tripDriverExp).toLocaleString()}
                               </span>
+                              <div className="text-[10px] text-slate-500">
+                                <span>Sal: ₹{(Number(trip.salary) || 0).toLocaleString()}</span>
+                                {tripDriverExp > 0 && (
+                                  <span className="text-emerald-700 font-bold block">
+                                    +₹{tripDriverExp.toLocaleString()} (Driver Exp)
+                                  </span>
+                                )}
+                              </div>
                               <span
-                                className={`text-[10px] font-bold uppercase ${trip.salaryStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'
+                                className={`text-[10px] font-bold uppercase block mt-0.5 ${trip.salaryStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'
                                   }`}
                               >
                                 {trip.salaryStatus || 'Pending'}
@@ -1053,6 +1074,57 @@ export const TripManagement = ({
                   <strong>Instructions:</strong> {selectedTripDetails.instructions || 'Standard'}
                 </p>
               </div>
+
+              {/* Trip Package Billing & Expense Attribution */}
+              {(() => {
+                const passExp = (expenses || [])
+                  .filter((e) => e.tripId === selectedTripDetails.id && e.paidBy === 'passenger' && e.status !== 'Rejected')
+                  .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+                const drvExp = (expenses || [])
+                  .filter((e) => e.tripId === selectedTripDetails.id && (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected')
+                  .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+                const pkgAmount = Number(selectedTripDetails.amount) || 0;
+                const netClientBalance = Math.max(0, pkgAmount - passExp);
+
+                return (
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                    <span className="font-bold text-slate-800 block">Trip Financial Breakdown</span>
+                    <div className="flex items-center justify-between text-slate-700">
+                      <span>Client Tour Package Bill:</span>
+                      <span className="font-bold">₹{pkgAmount.toLocaleString()}</span>
+                    </div>
+
+                    {passExp > 0 && (
+                      <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg space-y-0.5">
+                        <div className="flex items-center justify-between text-blue-900 font-bold">
+                          <span>👤 Paid on Road by Passenger:</span>
+                          <span>-₹{passExp.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-blue-700 text-[11px]">
+                          <span>Remaining Balance to Collect from Client:</span>
+                          <span className="font-bold">₹{netClientBalance.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {drvExp > 0 && (
+                      <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between text-emerald-900 font-semibold">
+                        <span>🚗 Driver Out-of-Pocket Expenses:</span>
+                        <span className="font-bold">+₹{drvExp.toLocaleString()} (added to salary)</span>
+                      </div>
+                    )}
+
+                    {Number(selectedTripDetails.salary) > 0 && (
+                      <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-slate-800">
+                        <span>Driver Total Remuneration:</span>
+                        <span className="text-orange-600 font-heading">
+                          ₹{(Number(selectedTripDetails.salary) + drvExp).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* If trip is completed, provide button to add salary */}
               {selectedTripDetails.status === 'Completed' && (

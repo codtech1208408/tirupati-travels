@@ -57,6 +57,7 @@ export const DriverApp = ({ onNavigateHome }) => {
     tripId: '',
     category: 'Fuel',
     amount: '',
+    paidBy: 'driver', // 'driver' | 'passenger'
     date: new Date().toISOString().slice(0, 10),
     notes: '',
     fuelFilled: '',
@@ -229,6 +230,7 @@ export const DriverApp = ({ onNavigateHome }) => {
     formData.append('category', expenseForm.category);
     formData.append('amount', expenseForm.amount);
     formData.append('date', expenseForm.date);
+    formData.append('paidBy', expenseForm.paidBy || 'driver');
     formData.append('notes', expenseForm.notes);
     if (expenseForm.category === 'Fuel') {
       formData.append('fuelFilled', expenseForm.fuelFilled);
@@ -1008,6 +1010,74 @@ export const DriverApp = ({ onNavigateHome }) => {
                     </div>
                   </div>
 
+                  {/* Paid By Selection (Who Paid for this Expense?) */}
+                  <div className="space-y-1.5">
+                    <label className="block font-semibold text-slate-700 text-xs">
+                      Paid By (Who Paid?) *
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setExpenseForm({ ...expenseForm, paidBy: 'driver' })}
+                        className={`p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
+                          (expenseForm.paidBy || 'driver') === 'driver'
+                            ? 'bg-orange-50/80 border-orange-500 text-orange-950 ring-2 ring-orange-500/20 shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                            (expenseForm.paidBy || 'driver') === 'driver'
+                              ? 'border-orange-600 bg-orange-600'
+                              : 'border-slate-300'
+                          }`}
+                        >
+                          {(expenseForm.paidBy || 'driver') === 'driver' && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-xs flex items-center gap-1">
+                            🚗 Paid by Driver
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">
+                            Driver paid out of pocket. Added to driver's salary payout in admin panel.
+                          </p>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setExpenseForm({ ...expenseForm, paidBy: 'passenger' })}
+                        className={`p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
+                          expenseForm.paidBy === 'passenger'
+                            ? 'bg-blue-50/80 border-blue-500 text-blue-950 ring-2 ring-blue-500/20 shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                            expenseForm.paidBy === 'passenger'
+                              ? 'border-blue-600 bg-blue-600'
+                              : 'border-slate-300'
+                          }`}
+                        >
+                          {expenseForm.paidBy === 'passenger' && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-xs flex items-center gap-1">
+                            👤 Paid by Passenger
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">
+                            Passenger paid on road. Deducted from client trip package balance.
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Fuel Fields */}
                   {expenseForm.category === 'Fuel' && (
                     <div className="grid grid-cols-2 gap-3 p-3 bg-orange-50/50 rounded-xl border border-orange-200 text-xs">
@@ -1111,9 +1181,20 @@ export const DriverApp = ({ onNavigateHome }) => {
                           {exp.status}
                         </span>
                       </div>
-                      <p className="text-slate-500 text-[11px]">
-                        Trip: <strong>{exp.tripId}</strong> • {exp.date}
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-slate-500 text-[11px]">
+                          Trip: <strong>{exp.tripId}</strong> • {exp.date}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                            exp.paidBy === 'passenger'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          }`}
+                        >
+                          {exp.paidBy === 'passenger' ? '👤 Paid by Passenger' : '🚗 Paid by Driver'}
+                        </span>
+                      </div>
                       {exp.adminRemarks && (
                         <p className="text-slate-600 text-[11px] bg-white p-1.5 rounded-md border border-slate-100">
                           <strong>Admin Remark:</strong> {exp.adminRemarks}

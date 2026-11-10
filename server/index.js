@@ -1291,12 +1291,21 @@ app.post('/api/trips/:id/close-deal', authenticateToken, (req, res) => {
   }
   const driver = db.users[driverIdx];
 
-  // Calculate Approved Expense Reimbursements for this trip
-  const tripExpenses = (db.expenses || []).filter(
-    (e) => e.tripId === trip.id && e.driverId === trip.driverId
+  // Calculate expenses paid by driver (to add to driver salary payout)
+  const driverExpenses = (db.expenses || []).filter(
+    (e) => e.tripId === trip.id && (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected'
   );
-  const approvedExpenses = tripExpenses.filter((e) => e.status === 'Approved');
-  const totalApprovedReimbursement = approvedExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  const totalDriverReimbursement = driverExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+  // Calculate expenses paid by passenger (to deduct from client package bill)
+  const passengerExpenses = (db.expenses || []).filter(
+    (e) => e.tripId === trip.id && e.paidBy === 'passenger' && e.status !== 'Rejected'
+  );
+  const totalPassengerExpenses = passengerExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+  const totalPayout = numSalary + totalDriverReimbursement;
+  const effectiveTripAmount = amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : (Number(trip.amount) || 0);
+  const netClientPayable = Math.max(0, effectiveTripAmount - totalPassengerExpenses);
 
   // Update Trip
   trip.salary = numSalary;
@@ -1308,14 +1317,17 @@ app.post('/api/trips/:id/close-deal', authenticateToken, (req, res) => {
   trip.closedAt = new Date().toISOString();
   trip.closedBy = req.user.id;
   if (notes) trip.closeNotes = notes;
+  trip.driverExpenseReimbursement = totalDriverReimbursement;
+  trip.passengerExpenses = totalPassengerExpenses;
+  trip.totalDriverPayout = totalPayout;
+  trip.netClientPayable = netClientPayable;
 
-  // Credit Driver Wallet: Salary + Approved Reimbursements
+  // Credit Driver Wallet: Salary + Driver Paid Expenses
   const prevBalance = Number(driver.walletBalance) || 0;
-  const totalCredit = numSalary; // Salary credited to wallet
 
-  driver.walletBalance = prevBalance + totalCredit;
-  driver.totalEarnings = (Number(driver.totalEarnings) || 0) + numSalary;
-  driver.totalReimbursements = (Number(driver.totalReimbursements) || 0) + totalApprovedReimbursement;
+  driver.walletBalance = prevBalance + totalPayout;
+  driver.totalEarnings = (Number(driver.totalEarnings) || 0) + totalPayout;
+  driver.totalReimbursements = (Number(driver.totalReimbursements) || 0) + totalDriverReimbursement;
   driver.availability = 'Available';
 
   // Create Wallet Ledger Transaction for Trip Salary
@@ -1447,18 +1459,37 @@ app.post('/api/trips/:id/settle-salary', authenticateToken, (req, res) => {
   const trip = db.trips[tripIdx];
   const salaryAmount = Number(trip.salary) || 0;
 
+  // Calculate expenses paid by driver for this trip (reimbursed with salary)
+  const driverExpenses = (db.expenses || []).filter(
+    (e) => e.tripId === trip.id && (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected'
+  );
+  const driverExpenseTotal = driverExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+  // Calculate expenses paid by passenger for this trip (deducted from passenger trip package bill)
+  const passengerExpenses = (db.expenses || []).filter(
+    (e) => e.tripId === trip.id && e.paidBy === 'passenger' && e.status !== 'Rejected'
+  );
+  const passengerExpenseTotal = passengerExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+  const totalPayoutToDriver = salaryAmount + driverExpenseTotal;
+  const netClientPayable = Math.max(0, (Number(trip.amount) || 0) - passengerExpenseTotal);
+
   trip.salaryStatus = 'Paid';
   trip.salaryPaidAt = new Date().toISOString();
   trip.salaryPaymentMode = paymentMode;
   trip.salaryNotes = notes;
+  trip.driverExpenseReimbursement = driverExpenseTotal;
+  trip.passengerExpenses = passengerExpenseTotal;
+  trip.totalDriverPayout = totalPayoutToDriver;
+  trip.netClientPayable = netClientPayable;
 
   // Credit driver wallet if assigned
   if (trip.driverId) {
     const driverIdx = db.users.findIndex((u) => u.id === trip.driverId);
     if (driverIdx !== -1) {
       const driver = db.users[driverIdx];
-      driver.walletBalance = (Number(driver.walletBalance) || 0) + salaryAmount;
-      driver.totalEarnings = (Number(driver.totalEarnings) || 0) + salaryAmount;
+      driver.walletBalance = (Number(driver.walletBalance) || 0) + totalPayoutToDriver;
+      driver.totalEarnings = (Number(driver.totalEarnings) || 0) + totalPayoutToDriver;
 
       // Add wallet transaction
       const salaryTx = {
@@ -1466,10 +1497,10 @@ app.post('/api/trips/:id/settle-salary', authenticateToken, (req, res) => {
         driverId: driver.id,
         tripId: trip.id,
         type: 'credit',
-        category: 'Trip Salary Settled',
-        amount: salaryAmount,
+        category: 'Trip Salary + Expenses Settled',
+        amount: totalPayoutToDriver,
         date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-        notes: `Salary settled for ${trip.id} via ${paymentMode}`,
+        notes: `Salary (₹${salaryAmount.toLocaleString()}) + Driver Out-of-Pocket Expenses (₹${driverExpenseTotal.toLocaleString()}) settled via ${paymentMode}`,
         balanceAfter: driver.walletBalance,
         createdAt: new Date().toISOString(),
       };
@@ -1480,8 +1511,8 @@ app.post('/api/trips/:id/settle-salary', authenticateToken, (req, res) => {
       createNotification({
         recipientRole: 'driver',
         recipientId: driver.id,
-        title: 'Trip Salary Settled & Paid',
-        message: `Your salary of ₹${salaryAmount.toLocaleString()} for trip ${trip.id} has been settled via ${paymentMode}.`,
+        title: 'Trip Remuneration Settled & Credited',
+        message: `Your payout of ₹${totalPayoutToDriver.toLocaleString()} (Salary ₹${salaryAmount} + Driver Expenses ₹${driverExpenseTotal}) for trip ${trip.id} has been settled via ${paymentMode}.`,
         type: 'salary_paid',
         tripId: trip.id,
       });
@@ -1532,7 +1563,21 @@ app.post('/api/drivers/:id/settle-all-dues', authenticateToken, (req, res) => {
     t.salaryStatus = 'Paid';
     t.salaryPaidAt = new Date().toISOString();
     t.salaryPaymentMode = paymentMode;
-    totalSettled += Number(t.salary) || 0;
+
+    const baseSal = Number(t.salary) || 0;
+    const tripDriverExp = (db.expenses || [])
+      .filter((e) => e.tripId === t.id && (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected')
+      .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    const tripPassExp = (db.expenses || [])
+      .filter((e) => e.tripId === t.id && e.paidBy === 'passenger' && e.status !== 'Rejected')
+      .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+    t.driverExpenseReimbursement = tripDriverExp;
+    t.passengerExpenses = tripPassExp;
+    t.totalDriverPayout = baseSal + tripDriverExp;
+    t.netClientPayable = Math.max(0, (Number(t.amount) || 0) - tripPassExp);
+
+    totalSettled += baseSal + tripDriverExp;
   });
 
   driver.walletBalance = (Number(driver.walletBalance) || 0) + totalSettled;
@@ -1611,7 +1656,7 @@ app.get('/api/expenses', authenticateToken, (req, res) => {
 
 // POST /api/expenses (Submit expense with proof)
 app.post('/api/expenses', authenticateToken, upload.single('proofFile'), (req, res) => {
-  const { tripId, category, amount, date, notes, fuelFilled, odometerReading, proofSample } = req.body;
+  const { tripId, category, amount, date, notes, fuelFilled, odometerReading, proofSample, paidBy } = req.body;
 
   const numAmount = Number(amount);
   if (!tripId || !category || !numAmount) {
@@ -1651,6 +1696,7 @@ app.post('/api/expenses', authenticateToken, upload.single('proofFile'), (req, r
     driverName: req.user.name,
     category,
     amount: numAmount,
+    paidBy: paidBy === 'passenger' ? 'passenger' : 'driver',
     date: date || new Date().toISOString().slice(0, 10),
     notes: notes || '',
     fuelFilled: category === 'Fuel' && fuelFilled ? Number(fuelFilled) : null,

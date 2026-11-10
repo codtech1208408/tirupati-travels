@@ -42,7 +42,21 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
   const totalPending = pendingExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
   const numSalary = Number(salary) || 0;
   const numAmount = Number(amount) || 0;
-  const totalCreditToWallet = numSalary; // Trip salary to credit
+
+  // Expenses paid by Driver (added to driver payout)
+  const driverExpenses = expenses.filter(
+    (e) => (e.paidBy || 'driver') === 'driver' && e.status !== 'Rejected'
+  );
+  const totalDriverExpenses = driverExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+  // Expenses paid by Passenger (deducted from client trip bill)
+  const passengerExpenses = expenses.filter(
+    (e) => e.paidBy === 'passenger' && e.status !== 'Rejected'
+  );
+  const totalPassengerExpenses = passengerExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+  const totalDriverPayout = numSalary + totalDriverExpenses;
+  const netClientPayable = Math.max(0, numAmount - totalPassengerExpenses);
 
   const handleSaveSalaryOnly = async () => {
     if (numSalary <= 0) {
@@ -162,7 +176,7 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
             <div className="flex items-center justify-between font-semibold text-slate-700">
               <span className="flex items-center gap-1.5">
                 <Receipt className="w-4 h-4 text-orange-500" />
-                Driver Expenses Logged ({expenses.length})
+                Trip On-Road Expenses ({expenses.length})
               </span>
               <span className="font-heading font-bold text-slate-900">
                 Total: ₹
@@ -172,14 +186,29 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
-              <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800">
-                <span className="block font-medium">Approved Reimbursements:</span>
-                <span className="font-bold text-sm">₹{totalApproved.toLocaleString()}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+              <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900">
+                <span className="block font-bold flex items-center gap-1">
+                  🚗 Paid by Driver:
+                </span>
+                <span className="font-extrabold text-sm block text-emerald-700">
+                  ₹{totalDriverExpenses.toLocaleString()}
+                </span>
+                <span className="text-[10px] text-emerald-600 block mt-0.5">
+                  Added to driver's salary payout (+Reimbursement)
+                </span>
               </div>
-              <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800">
-                <span className="block font-medium">Pending Approvals:</span>
-                <span className="font-bold text-sm">₹{totalPending.toLocaleString()}</span>
+
+              <div className="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900">
+                <span className="block font-bold flex items-center gap-1">
+                  👤 Paid by Passenger:
+                </span>
+                <span className="font-extrabold text-sm block text-blue-700">
+                  ₹{totalPassengerExpenses.toLocaleString()}
+                </span>
+                <span className="text-[10px] text-blue-600 block mt-0.5">
+                  Deducted from client's trip package balance (-Minus)
+                </span>
               </div>
             </div>
           </div>
@@ -237,22 +266,42 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
             ></textarea>
           </div>
 
-          {/* Net Credit Summary Card */}
-          <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between shadow-md">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Wallet className="w-5 h-5 text-white" />
+          {/* Net Summaries */}
+          <div className="space-y-2">
+            {/* Net Credit to Driver (Salary + Driver Paid Expenses) */}
+            <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between shadow-md">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-white/20 rounded-lg shrink-0">
+                  <Wallet className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold text-emerald-100 uppercase tracking-wider">
+                    Total Driver Payout (Salary + Driver Expenses)
+                  </p>
+                  <p className="text-xs text-white/90">
+                    Base Salary ₹{numSalary.toLocaleString()} + Expenses ₹{totalDriverExpenses.toLocaleString()}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-[11px] font-semibold text-emerald-100 uppercase tracking-wider">
-                  Net Wallet Credit to Driver
-                </p>
-                <p className="text-xs text-white/90">Instant ledger balance update</p>
-              </div>
+              <span className="font-heading font-extrabold text-2xl shrink-0">
+                ₹{totalDriverPayout.toLocaleString()}
+              </span>
             </div>
-            <span className="font-heading font-extrabold text-2xl">
-              ₹{totalCreditToWallet.toLocaleString()}
-            </span>
+
+            {/* Client Trip Package Balance (Total Amount - Passenger Paid Expenses) */}
+            <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-blue-800">
+                  Remaining To Collect From Passenger / Client
+                </p>
+                <p className="text-[11px] text-blue-700">
+                  Total ₹{numAmount.toLocaleString()} minus Passenger On-Road Paid ₹{totalPassengerExpenses.toLocaleString()}
+                </p>
+              </div>
+              <span className="font-heading font-extrabold text-lg text-blue-900 shrink-0">
+                ₹{netClientPayable.toLocaleString()}
+              </span>
+            </div>
           </div>
 
           {/* Actions */}
