@@ -39,17 +39,19 @@ export const ManagerApp = ({ onNavigateHome }) => {
   const [trips, setTrips] = useState([]);
   const [packages, setPackages] = useState([]);
   const [drivers, setDrivers] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const [tripsRes, pkgsRes, expRes, usersRes] = await Promise.all([
+      const [tripsRes, pkgsRes, expRes, usersRes, vehRes] = await Promise.all([
         fetch('/api/trips', { headers }),
         fetch('/api/packages'),
         fetch('/api/expenses', { headers }),
         fetch('/api/users?role=driver', { headers }),
+        fetch('/api/vehicles'),
       ]);
 
       if (tripsRes.ok) {
@@ -67,6 +69,10 @@ export const ManagerApp = ({ onNavigateHome }) => {
       if (usersRes.ok) {
         const d = await usersRes.json();
         setDrivers(d.users || []);
+      }
+      if (vehRes && vehRes.ok) {
+        const d = await vehRes.json();
+        setVehicles(d.vehicles || []);
       }
     } catch (err) {
       console.error(err);
@@ -339,6 +345,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
               packages={packages}
               clients={[]}
               drivers={drivers}
+              vehicles={vehicles}
               onRefresh={fetchData}
               role="manager"
               initialOpenAdd={activeTab === 'create_trip'}

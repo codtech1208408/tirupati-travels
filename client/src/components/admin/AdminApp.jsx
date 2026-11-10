@@ -28,6 +28,7 @@ import { ExpenseReview } from './ExpenseReview';
 import { Reports } from './Reports';
 import { ActivityLogs } from './ActivityLogs';
 import { InquiriesManagement } from './InquiriesManagement';
+import { VehicleManagement } from './VehicleManagement';
 import { NotificationsDrawer } from '../common/NotificationsDrawer';
 
 export const AdminApp = ({ onNavigateHome }) => {
@@ -41,6 +42,7 @@ export const AdminApp = ({ onNavigateHome }) => {
   const [packages, setPackages] = useState([]);
   const [clients, setClients] = useState([]);
   const [users, setUsers] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [inquiries, setInquiries] = useState([]);
@@ -51,7 +53,7 @@ export const AdminApp = ({ onNavigateHome }) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [tripsRes, pkgsRes, clientsRes, usersRes, expRes, logsRes, inqRes] = await Promise.all([
+      const [tripsRes, pkgsRes, clientsRes, usersRes, expRes, logsRes, inqRes, vehRes] = await Promise.all([
         fetch('/api/trips', { headers }),
         fetch('/api/packages'),
         fetch('/api/clients', { headers }),
@@ -59,6 +61,7 @@ export const AdminApp = ({ onNavigateHome }) => {
         fetch('/api/expenses', { headers }),
         fetch('/api/activity-logs', { headers }),
         fetch('/api/inquiries', { headers }),
+        fetch('/api/vehicles'),
       ]);
 
       if (tripsRes.ok) {
@@ -89,6 +92,10 @@ export const AdminApp = ({ onNavigateHome }) => {
         const d = await inqRes.json();
         setInquiries(d.inquiries || []);
       }
+      if (vehRes && vehRes.ok) {
+        const d = await vehRes.json();
+        setVehicles(d.vehicles || []);
+      }
     } catch (err) {
       console.error('Error fetching admin data:', err);
     } finally {
@@ -104,6 +111,7 @@ export const AdminApp = ({ onNavigateHome }) => {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'create_trip', label: 'Create New Trip', icon: PlusCircle, badge: 'New' },
     { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
+    { id: 'vehicles', label: 'Fleet Vehicles', icon: Car, badge: `${vehicles.length || 0}` },
     { id: 'packages', label: 'Packages', icon: Package },
     { id: 'clients', label: 'Clients / Travellers', icon: Users, badge: 'Privacy' },
     {
@@ -293,9 +301,13 @@ export const AdminApp = ({ onNavigateHome }) => {
 
           {activeTab === 'dashboard' && (
             <AdminDashboard
-              data={{ trips, packages, clients, users, expenses, activityLogs }}
+              data={{ trips, packages, clients, users, expenses, activityLogs, vehicles }}
               onNavigate={(tab) => setActiveTab(tab)}
             />
+          )}
+
+          {activeTab === 'vehicles' && (
+            <VehicleManagement vehicles={vehicles} onRefresh={fetchData} role="admin" />
           )}
 
           {activeTab === 'packages' && (
@@ -313,6 +325,7 @@ export const AdminApp = ({ onNavigateHome }) => {
               packages={packages}
               clients={clients}
               drivers={users.filter((u) => u.role === 'driver')}
+              vehicles={vehicles}
               onRefresh={fetchData}
               role="admin"
               initialOpenAdd={activeTab === 'create_trip'}
@@ -343,6 +356,7 @@ export const AdminApp = ({ onNavigateHome }) => {
               packages={packages}
               clients={clients}
               drivers={users.filter((u) => u.role === 'driver')}
+              vehicles={vehicles}
               onRefresh={fetchData}
               role="admin"
             />

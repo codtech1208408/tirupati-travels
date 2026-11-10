@@ -609,6 +609,156 @@ app.delete('/api/packages/:id', authenticateToken, (req, res) => {
 });
 
 /* ==========================================================================
+   3.5 FLEET VEHICLES MANAGEMENT
+   ========================================================================== */
+
+// GET /api/vehicles
+app.get('/api/vehicles', (req, res) => {
+  const db = readDb();
+  let vehicles = db.vehicles || [];
+  if (vehicles.length === 0) {
+    vehicles = [
+      {
+        id: 'VEH-001',
+        regNumber: 'AP 39 AB 1234',
+        vehicleType: 'Tempo Traveller Luxury AC (12 Seater)',
+        model: 'Force Tempo Traveller 3350',
+        capacity: 12,
+        fuelType: 'Diesel',
+        status: 'Active',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'VEH-002',
+        regNumber: 'AP 39 TT 5678',
+        vehicleType: 'Toyota Innova Crysta (7 Seater)',
+        model: 'Innova Crysta 2.4 VX',
+        capacity: 7,
+        fuelType: 'Diesel',
+        status: 'Active',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'VEH-003',
+        regNumber: 'AP 03 BX 9012',
+        vehicleType: 'Swift Dzire Luxury Sedan (4 Seater)',
+        model: 'Maruti Suzuki Dzire',
+        capacity: 4,
+        fuelType: 'Petrol / CNG',
+        status: 'Active',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'VEH-004',
+        regNumber: 'AP 39 CC 3456',
+        vehicleType: 'Force Urbania Executive (10 Seater)',
+        model: 'Force Urbania 3615',
+        capacity: 10,
+        fuelType: 'Diesel',
+        status: 'Active',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'VEH-005',
+        regNumber: 'AP 03 DY 7890',
+        vehicleType: 'Ashok Leyland Air Suspended Coach (32 Seater)',
+        model: 'Ashok Leyland Viking Coach',
+        capacity: 32,
+        fuelType: 'Diesel',
+        status: 'Active',
+        createdAt: new Date().toISOString(),
+      },
+    ];
+    db.vehicles = vehicles;
+    writeDb(db);
+  }
+  res.json({ vehicles });
+});
+
+// POST /api/vehicles
+app.post('/api/vehicles', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Admin or Manager access required' });
+  }
+
+  const { regNumber, vehicleType, model, capacity, fuelType, status } = req.body;
+  if (!regNumber || !vehicleType) {
+    return res.status(400).json({ error: 'Vehicle registration number and vehicle type are required' });
+  }
+
+  const db = readDb();
+  if (!db.vehicles) db.vehicles = [];
+
+  const cleanReg = regNumber.trim().toUpperCase();
+  if (db.vehicles.some((v) => v.regNumber.toUpperCase() === cleanReg)) {
+    return res.status(400).json({ error: `Vehicle with registration number ${cleanReg} already exists` });
+  }
+
+  const newVehicle = {
+    id: `VEH-${String(db.vehicles.length + 1).padStart(3, '0')}`,
+    regNumber: cleanReg,
+    vehicleType: vehicleType.trim(),
+    model: model ? model.trim() : vehicleType.trim(),
+    capacity: Number(capacity) || 4,
+    fuelType: fuelType || 'Diesel',
+    status: status || 'Active',
+    createdAt: new Date().toISOString(),
+    createdBy: req.user.id,
+  };
+
+  db.vehicles = [newVehicle, ...db.vehicles];
+  writeDb(db);
+
+  logActivity(req.user.id, req.user.name, req.user.role, 'VEHICLE_CREATED', `Registered vehicle ${newVehicle.regNumber} (${newVehicle.vehicleType})`);
+
+  res.status(201).json({ success: true, vehicle: newVehicle });
+});
+
+// PUT /api/vehicles/:id
+app.put('/api/vehicles/:id', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Admin or Manager access required' });
+  }
+
+  const db = readDb();
+  const idx = (db.vehicles || []).findIndex((v) => v.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Vehicle not found' });
+
+  const existing = db.vehicles[idx];
+  const updated = {
+    ...existing,
+    ...req.body,
+    regNumber: req.body.regNumber ? req.body.regNumber.trim().toUpperCase() : existing.regNumber,
+    id: existing.id,
+  };
+
+  db.vehicles[idx] = updated;
+  writeDb(db);
+
+  logActivity(req.user.id, req.user.name, req.user.role, 'VEHICLE_UPDATED', `Updated vehicle ${updated.regNumber}`);
+
+  res.json({ success: true, vehicle: updated });
+});
+
+// DELETE /api/vehicles/:id
+app.delete('/api/vehicles/:id', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+
+  const db = readDb();
+  const vehicle = (db.vehicles || []).find((v) => v.id === req.params.id);
+  if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
+
+  db.vehicles = db.vehicles.filter((v) => v.id !== req.params.id);
+  writeDb(db);
+
+  logActivity(req.user.id, req.user.name, 'admin', 'VEHICLE_DELETED', `Deleted vehicle ${vehicle.regNumber}`);
+
+  res.json({ success: true, message: 'Vehicle deleted' });
+});
+
+/* ==========================================================================
    4. CLIENT / TRAVELLER MANAGEMENT (STRICT PRIVACY - ADMIN ONLY)
    ========================================================================== */
 
@@ -788,11 +938,15 @@ app.post('/api/trips', authenticateToken, (req, res) => {
     startDate,
     endDate,
     route,
+    routeDays,
     stops,
     vehicleDetails,
+    vehicleType,
+    vehicleRegNumber,
     instructions,
     driverId,
     salary,
+    amount,
     travellersCount,
     notes,
   } = req.body;
@@ -823,6 +977,10 @@ app.post('/api/trips', authenticateToken, (req, res) => {
     driverName = driver.name;
   }
 
+  const formattedVehicle = vehicleRegNumber
+    ? (vehicleType ? `${vehicleType} (${vehicleRegNumber})` : vehicleRegNumber)
+    : (vehicleDetails || 'Tempo Traveller Luxury AC (AP 39 AB 1234)');
+
   const tripYear = new Date(startDate).getFullYear() || 2026;
   const count = (db.trips?.length || 0) + 1;
   const newTrip = {
@@ -838,16 +996,21 @@ app.post('/api/trips', authenticateToken, (req, res) => {
     startDate,
     endDate: effectiveEndDate,
     route: route || 'Tirupati Circuit',
+    routeDays: Array.isArray(routeDays) ? routeDays : null,
     stops: stops || 'Tirumala, Alipiri',
-    vehicleDetails: vehicleDetails || 'Tempo Traveller',
+    vehicleDetails: formattedVehicle,
+    vehicleType: vehicleType || null,
+    vehicleRegNumber: vehicleRegNumber || null,
     instructions: instructions || 'Drive carefully and assist pilgrims with darshan timings.',
     driverId: driverId || null,
     driverName: driverName,
     status: 'Upcoming',
     salary: Number(salary) || 0,
+    amount: Number(amount) || 0,
     salaryStatus: 'Pending',
     notes: notes || '',
     closedAt: null,
+    closedBy: null,
     closedBy: null,
     adjustments: [],
     createdAt: new Date().toISOString(),
@@ -997,6 +1160,14 @@ app.put('/api/trips/:id/status', authenticateToken, (req, res) => {
   }
 
   existing.status = status;
+  if (status === 'Completed') {
+    const nowIso = new Date().toISOString();
+    existing.endDate = nowIso;
+    existing.endedAt = nowIso;
+    existing.completedAt = nowIso;
+  } else if (status === 'Ongoing' && !existing.startedAt) {
+    existing.startedAt = new Date().toISOString();
+  }
   db.trips[idx] = existing;
 
   // If driver on trip, update driver availability
@@ -1051,7 +1222,7 @@ app.post('/api/trips/:id/close-deal', authenticateToken, (req, res) => {
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  const { salary, notes } = req.body;
+  const { salary, amount, notes } = req.body;
   const numSalary = Number(salary);
   if (isNaN(numSalary) || numSalary < 0) {
     return res.status(400).json({ error: 'A valid salary amount is required' });
@@ -1086,6 +1257,9 @@ app.post('/api/trips/:id/close-deal', authenticateToken, (req, res) => {
 
   // Update Trip
   trip.salary = numSalary;
+  if (amount !== undefined && !isNaN(Number(amount))) {
+    trip.amount = Number(amount);
+  }
   trip.salaryStatus = 'Paid';
   trip.status = 'Closed';
   trip.closedAt = new Date().toISOString();

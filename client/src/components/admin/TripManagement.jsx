@@ -22,7 +22,16 @@ import {
 } from 'lucide-react';
 import { SalaryClosingModal } from './SalaryClosingModal';
 
-export const TripManagement = ({ trips = [], packages = [], clients = [], drivers = [], onRefresh, role = 'admin', initialOpenAdd = false }) => {
+export const TripManagement = ({
+  trips = [],
+  packages = [],
+  clients = [],
+  drivers = [],
+  vehicles = [],
+  onRefresh,
+  role = 'admin',
+  initialOpenAdd = false,
+}) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(initialOpenAdd);
@@ -33,6 +42,12 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
   // Adjustment Entry State
   const [adjModalTrip, setAdjModalTrip] = useState(null);
   const [adjForm, setAdjForm] = useState({ type: 'credit', amount: 1000, reason: '' });
+
+  // Route Days State
+  const [routeDays, setRouteDays] = useState([
+    { day: 1, route: 'Tirupati Arrival, Hotel Check-in & Alipiri Darshan' },
+    { day: 2, route: 'Tirumala VIP Balaji Darshan, Padmavathi Temple' },
+  ]);
 
   // Trip Form State
   const [formData, setFormData] = useState({
@@ -46,27 +61,109 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     dropLocation: 'Sightseeing / Destination',
     startDate: '',
     endDate: '',
-    route: 'Tirupati Circuit',
+    route: 'Day 1: Tirupati Arrival & Alipiri → Day 2: Tirumala VIP Darshan',
+    routeDays: [
+      { day: 1, route: 'Tirupati Arrival, Hotel Check-in & Alipiri Darshan' },
+      { day: 2, route: 'Tirumala VIP Balaji Darshan, Padmavathi Temple' },
+    ],
     stops: 'Alipiri, Srinivasa Mangapuram',
-    vehicleDetails: 'Tempo Traveller (AP 39 AB 1234)',
+    vehicleType: 'Tempo Traveller Luxury AC (12 Seater)',
+    vehicleRegNumber: 'AP 39 AB 1234',
+    vehicleDetails: 'Tempo Traveller Luxury AC (12 Seater) (AP 39 AB 1234)',
     instructions: 'Pickup pilgrims on time. Assist with VIP entry coordination.',
     driverId: '',
-    salary: 16000,
+    salary: 0,
+    amount: 25000,
     notes: '',
   });
 
   const [dateClashError, setDateClashError] = useState('');
 
+  // Route Day-by-Day Handlers
+  const handleAddDay = () => {
+    setRouteDays((prev) => {
+      const nextDay = prev.length + 1;
+      const updated = [...prev, { day: nextDay, route: '' }];
+      syncRouteString(updated);
+      return updated;
+    });
+  };
+
+  const handleRemoveDay = (index) => {
+    setRouteDays((prev) => {
+      const filtered = prev.filter((_, idx) => idx !== index);
+      const renumbered = filtered.map((d, idx) => ({ ...d, day: idx + 1 }));
+      syncRouteString(renumbered);
+      return renumbered;
+    });
+  };
+
+  const handleDayRouteChange = (index, value) => {
+    setRouteDays((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], route: value };
+      syncRouteString(updated);
+      return updated;
+    });
+  };
+
+  const syncRouteString = (days) => {
+    const combined = days
+      .filter((d) => d.route.trim())
+      .map((d) => `Day ${d.day}: ${d.route.trim()}`)
+      .join(' → ');
+    setFormData((prev) => ({
+      ...prev,
+      route: combined || prev.route,
+      routeDays: days,
+    }));
+  };
+
+  // Vehicle Selection Handlers
+  const handleVehicleRegSelect = (reg) => {
+    const found = vehicles.find((v) => v.regNumber === reg);
+    if (found) {
+      setFormData((prev) => ({
+        ...prev,
+        vehicleRegNumber: found.regNumber,
+        vehicleType: found.vehicleType,
+        vehicleDetails: `${found.vehicleType} (${found.regNumber})`,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        vehicleRegNumber: reg,
+        vehicleDetails: prev.vehicleType ? `${prev.vehicleType} (${reg})` : reg,
+      }));
+    }
+  };
+
+  const handleVehicleTypeChange = (type) => {
+    setFormData((prev) => ({
+      ...prev,
+      vehicleType: type,
+      vehicleDetails: prev.vehicleRegNumber ? `${type} (${prev.vehicleRegNumber})` : type,
+    }));
+  };
+
   // Auto-populate when selecting package
   const handlePackageChange = (pkgId) => {
     const pkg = packages.find((p) => p.id === pkgId);
     if (pkg) {
+      const pkgDays = pkg.route
+        ? [{ day: 1, route: pkg.route }]
+        : [{ day: 1, route: 'Tirupati Circuit & Tirumala Balaji' }];
+      setRouteDays(pkgDays);
       setFormData((prev) => ({
         ...prev,
         packageId: pkg.id,
         name: pkg.name,
-        route: pkg.route,
-        vehicleDetails: pkg.vehicleType,
+        route: pkg.route || prev.route,
+        routeDays: pkgDays,
+        vehicleType: pkg.vehicleType || prev.vehicleType,
+        vehicleDetails: prev.vehicleRegNumber
+          ? `${pkg.vehicleType || prev.vehicleType} (${prev.vehicleRegNumber})`
+          : pkg.vehicleType,
       }));
     } else {
       setFormData((prev) => ({ ...prev, packageId: '' }));
@@ -105,8 +202,18 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     tomorrow.setDate(tomorrow.getDate() + 1);
     const dateStr = tomorrow.toISOString().slice(0, 16);
 
+    const initialDays = [
+      { day: 1, route: 'Arrival at Tirupati Railway Station, Hotel Check-in & Alipiri Gate' },
+      { day: 2, route: 'Tirumala Balaji VIP Sheegra Darshan, Padmavathi Ammavari Temple' },
+    ];
+    setRouteDays(initialDays);
+
+    const defaultVeh = vehicles[0];
+    const defaultReg = defaultVeh ? defaultVeh.regNumber : 'AP 39 AB 1234';
+    const defaultType = defaultVeh ? defaultVeh.vehicleType : 'Tempo Traveller Luxury AC (12 Seater)';
+
     setFormData({
-      name: packages[0]?.name || 'Tirupati Darshan Package',
+      name: packages[0]?.name || 'Tirupati Balaji Divine Darshan Package',
       packageId: packages[0]?.id || '',
       clientId: '',
       clientName: '',
@@ -116,12 +223,16 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
       dropLocation: 'Sightseeing / Destination',
       startDate: dateStr,
       endDate: dateStr,
-      route: packages[0]?.route || 'Hyderabad → Tirupati → Tirumala',
+      route: initialDays.map((d) => `Day ${d.day}: ${d.route}`).join(' → '),
+      routeDays: initialDays,
       stops: 'Alipiri, Srinivasa Mangapuram, Kapila Theertham',
-      vehicleDetails: 'Tempo Traveller Luxury AC (AP 39 AB 1234)',
+      vehicleType: defaultType,
+      vehicleRegNumber: defaultReg,
+      vehicleDetails: `${defaultType} (${defaultReg})`,
       instructions: 'Confirm pickup 1 hour prior. Ensure luggage space is clean.',
       driverId: '',
-      salary: 16000,
+      salary: 0,
+      amount: 25000,
       notes: 'VIP pilgrimage booking.',
     });
     setIsAddModalOpen(true);
@@ -131,6 +242,24 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     setEditingTrip(trip);
     setDateClashError('');
     const startDateStr = trip.startDate ? trip.startDate.slice(0, 16) : '';
+
+    let loadedDays = [];
+    if (trip.routeDays && Array.isArray(trip.routeDays) && trip.routeDays.length > 0) {
+      loadedDays = trip.routeDays;
+    } else if (trip.route && trip.route.includes('Day ')) {
+      const parts = trip.route.split(/Day \d+:\s*/).filter(Boolean);
+      loadedDays = parts.map((part, idx) => ({
+        day: idx + 1,
+        route: part.replace(/→\s*$/, '').replace(/\|\s*$/, '').trim(),
+      }));
+    } else {
+      loadedDays = [{ day: 1, route: trip.route || '' }];
+    }
+    setRouteDays(loadedDays.length > 0 ? loadedDays : [{ day: 1, route: trip.route || '' }]);
+
+    const currentVehType = trip.vehicleType || 'Tempo Traveller Luxury AC (12 Seater)';
+    const currentReg = trip.vehicleRegNumber || (trip.vehicleDetails ? trip.vehicleDetails.match(/\(([^)]+)\)/)?.[1] || '' : '');
+
     setFormData({
       name: trip.name,
       packageId: trip.packageId || '',
@@ -143,11 +272,15 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
       startDate: startDateStr,
       endDate: trip.endDate ? trip.endDate.slice(0, 16) : startDateStr,
       route: trip.route,
+      routeDays: loadedDays,
       stops: trip.stops || '',
-      vehicleDetails: trip.vehicleDetails || '',
+      vehicleType: currentVehType,
+      vehicleRegNumber: currentReg,
+      vehicleDetails: trip.vehicleDetails || `${currentVehType} (${currentReg})`,
       instructions: trip.instructions || '',
       driverId: trip.driverId || '',
-      salary: trip.salary || 16000,
+      salary: trip.salary || 0,
+      amount: trip.amount || 25000,
       notes: trip.notes || '',
     });
     setIsAddModalOpen(true);
@@ -173,9 +306,21 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     const method = editingTrip ? 'PUT' : 'POST';
 
     try {
+      const combinedRoute = routeDays
+        .filter((d) => d.route.trim())
+        .map((d) => `Day ${d.day}: ${d.route.trim()}`)
+        .join(' → ') || formData.route;
+
+      const formattedVeh = formData.vehicleRegNumber
+        ? `${formData.vehicleType || 'Tempo Traveller'} (${formData.vehicleRegNumber})`
+        : formData.vehicleDetails;
+
       const payload = {
         ...formData,
         endDate: effectiveEndDate,
+        route: combinedRoute,
+        routeDays: routeDays,
+        vehicleDetails: formattedVeh,
         clientName: formData.clientName.trim(),
         clientMobile: formData.clientMobile.trim(),
       };
@@ -351,24 +496,34 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     </td>
 
                     <td className="px-4 py-3.5">
-                      <div className="space-y-0.5">
-                        <span className="text-slate-800 font-medium block">
-                          {new Date(trip.startDate).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </span>
-                        {trip.endDate && new Date(trip.endDate).toDateString() !== new Date(trip.startDate).toDateString() && (
-                          <span className="text-[11px] text-slate-400 block">
-                            to{' '}
-                            {new Date(trip.endDate).toLocaleDateString('en-GB', {
+                      <div className="space-y-1">
+                        <div>
+                          <span className="text-[10px] text-slate-400 font-semibold block uppercase">Start</span>
+                          <span className="text-slate-800 font-medium block">
+                            {new Date(trip.startDate).toLocaleDateString('en-GB', {
                               day: '2-digit',
                               month: 'short',
                               year: 'numeric',
                             })}
                           </span>
-                        )}
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-400 font-semibold block uppercase">Trip End Time</span>
+                          {trip.status === 'Completed' || trip.status === 'Closed' ? (
+                            <span className="text-emerald-700 font-bold flex items-center gap-1 text-[11px]">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                              {new Date(trip.endDate || trip.endedAt || trip.completedAt).toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          ) : (
+                            <span className="text-amber-600 font-medium text-[11px] block">
+                              ⏳ Recorded upon completion
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
 
@@ -439,15 +594,15 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
                     <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        {/* Close Deal Button for Completed Trips */}
+                        {/* Close Project Button for Completed Trips */}
                         {trip.status === 'Completed' && (
                           <button
                             onClick={() => setClosingTrip(trip)}
-                            className="px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold text-[11px] shadow-xs flex items-center gap-1"
-                            title="Close Deal & Credit Wallet"
+                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm flex items-center gap-1.5 cursor-pointer animate-pulse"
+                            title="Trip is completed! Assign salary and close project"
                           >
-                            <DollarSign className="w-3.5 h-3.5" />
-                            <span>Close Deal</span>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Close Project</span>
                           </button>
                         )}
 
@@ -587,34 +742,66 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                 </div>
               </div>
 
-              {/* Route & Trip Start Date */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Travel Route *
+              {/* Travel Route & Day-by-Day Route Planner */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Travel Route (Day-by-Day Itinerary) *
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.route}
-                    onChange={(e) => setFormData({ ...formData, route: e.target.value })}
-                    placeholder="e.g. Tirupati Circuit / Tirumala"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
+                  <button
+                    type="button"
+                    onClick={handleAddDay}
+                    className="px-2.5 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Add Day</span>
+                  </button>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Trip Start Date & Time *
-                  </label>
-                  <input
-                    type="datetime-local"
-                    required
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {routeDays.map((d, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="px-2.5 py-2 rounded-lg bg-[#1e1035] text-white font-bold text-xs shrink-0 whitespace-nowrap">
+                        Day {d.day}
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={d.route}
+                        onChange={(e) => handleDayRouteChange(idx, e.target.value)}
+                        placeholder={`e.g. Day ${d.day} Route & Temple Destinations`}
+                        className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
+                      />
+                      {routeDays.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDay(idx)}
+                          className="w-7 h-7 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors flex items-center justify-center cursor-pointer shrink-0"
+                          title="Remove Day"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
+              </div>
+
+              {/* Trip Start Date & Time */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Trip Start Date & Time *
+                </label>
+                <input
+                  type="datetime-local"
+                  required
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Trip End Date & Time will be automatically recorded directly when the driver ends the trip.
+                </p>
               </div>
 
               {/* Driver Assignment: Available Drivers Only */}
@@ -645,33 +832,85 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                 )}
               </div>
 
-              {/* Pickup Location & Vehicle Details */}
+              {/* Vehicle Type & Vehicle Registration Number */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Pickup Location
+                    Vehicle Type *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.pickupLocation}
-                    onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
-                    placeholder="e.g. Tirupati Railway Station"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
+                  <select
+                    value={formData.vehicleType}
+                    onChange={(e) => handleVehicleTypeChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
+                  >
+                    <option value="Tempo Traveller Luxury AC (12 Seater)">Tempo Traveller Luxury AC (12 Seater)</option>
+                    <option value="Tempo Traveller Luxury AC (14 Seater)">Tempo Traveller Luxury AC (14 Seater)</option>
+                    <option value="Toyota Innova Crysta (7 Seater)">Toyota Innova Crysta (7 Seater)</option>
+                    <option value="Toyota Innova Hycross (7 Seater)">Toyota Innova Hycross (7 Seater)</option>
+                    <option value="Swift Dzire Luxury Sedan (4 Seater)">Swift Dzire Luxury Sedan (4 Seater)</option>
+                    <option value="Force Urbania Executive (10 Seater)">Force Urbania Executive (10 Seater)</option>
+                    <option value="Mini Bus AC Coach (22 Seater)">Mini Bus AC Coach (22 Seater)</option>
+                    <option value="Ashok Leyland Air Suspended Coach (32 Seater)">Ashok Leyland Coach (32 Seater)</option>
+                    {vehicles.filter(v => ![
+                      'Tempo Traveller Luxury AC (12 Seater)',
+                      'Tempo Traveller Luxury AC (14 Seater)',
+                      'Toyota Innova Crysta (7 Seater)',
+                      'Toyota Innova Hycross (7 Seater)',
+                      'Swift Dzire Luxury Sedan (4 Seater)',
+                      'Force Urbania Executive (10 Seater)',
+                      'Mini Bus AC Coach (22 Seater)',
+                      'Ashok Leyland Air Suspended Coach (32 Seater)'
+                    ].includes(v.vehicleType)).map(v => (
+                      <option key={v.id} value={v.vehicleType}>{v.vehicleType}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Vehicle Details & Reg Number
+                    Vehicle Registration Number *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.vehicleDetails}
-                    onChange={(e) => setFormData({ ...formData, vehicleDetails: e.target.value })}
-                    placeholder="e.g. Tempo Traveller (AP 39 AB 1234)"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
+                  {vehicles.length > 0 ? (
+                    <select
+                      value={formData.vehicleRegNumber}
+                      onChange={(e) => handleVehicleRegSelect(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-white font-mono font-bold text-slate-800 focus:ring-2 focus:ring-orange-500 outline-hidden"
+                    >
+                      <option value="">-- Choose Registered Vehicle --</option>
+                      {vehicles.map((v) => (
+                        <option key={v.id} value={v.regNumber}>
+                          {v.regNumber} ({v.vehicleType || v.model})
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      required
+                      value={formData.vehicleRegNumber}
+                      onChange={(e) => setFormData({ ...formData, vehicleRegNumber: e.target.value.toUpperCase() })}
+                      placeholder="e.g. AP 39 AB 1234"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-orange-500 outline-hidden"
+                    />
+                  )}
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Choose from registered fleet or create in Fleet Vehicles tab
+                  </p>
                 </div>
+              </div>
+
+              {/* Pickup Location */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Pickup Location
+                </label>
+                <input
+                  type="text"
+                  value={formData.pickupLocation}
+                  onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
+                  placeholder="e.g. Tirupati Central Railway Station"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
+                />
               </div>
 
               {/* Instructions & Stops */}
@@ -738,9 +977,18 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
             <div className="space-y-2.5 text-xs">
               <div className="p-3 bg-slate-50 rounded-xl space-y-1.5 border border-slate-200">
                 <p>
-                  <strong>Date:</strong> {new Date(selectedTripDetails.startDate).toLocaleString()}
-                  {selectedTripDetails.endDate && new Date(selectedTripDetails.endDate).toDateString() !== new Date(selectedTripDetails.startDate).toDateString() && (
-                    <> → {new Date(selectedTripDetails.endDate).toLocaleString()}</>
+                  <strong>Trip Start:</strong> {new Date(selectedTripDetails.startDate).toLocaleString()}
+                </p>
+                <p>
+                  <strong>Trip End Date & Time:</strong>{' '}
+                  {selectedTripDetails.status === 'Completed' || selectedTripDetails.status === 'Closed' ? (
+                    <span className="text-emerald-700 font-bold">
+                      {new Date(selectedTripDetails.endDate || selectedTripDetails.endedAt || selectedTripDetails.completedAt).toLocaleString()} (Completed)
+                    </span>
+                  ) : (
+                    <span className="text-amber-600 font-medium">
+                      Pending (Will be automatically recorded when driver ends trip)
+                    </span>
                   )}
                 </p>
                 {(selectedTripDetails.clientName || selectedTripDetails.client?.name) && (
@@ -749,16 +997,28 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     {(selectedTripDetails.clientMobile || selectedTripDetails.client?.phone) ? ` (${selectedTripDetails.clientMobile || selectedTripDetails.client?.phone})` : ''}
                   </p>
                 )}
+                <div>
+                  <strong>Travel Route:</strong>
+                  {selectedTripDetails.routeDays && selectedTripDetails.routeDays.length > 0 ? (
+                    <div className="mt-1 space-y-1 pl-1">
+                      {selectedTripDetails.routeDays.map((d, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded-sm bg-purple-100 text-purple-900 font-bold text-[10px]">
+                            Day {d.day}
+                          </span>
+                          <span className="text-slate-800">{d.route}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="ml-1 text-slate-800">{selectedTripDetails.route}</span>
+                  )}
+                </div>
                 <p>
                   <strong>Pickup:</strong> {selectedTripDetails.pickupLocation}
                 </p>
-                {selectedTripDetails.dropLocation && selectedTripDetails.dropLocation !== 'Sightseeing / Destination' && (
-                  <p>
-                    <strong>Drop:</strong> {selectedTripDetails.dropLocation}
-                  </p>
-                )}
                 <p>
-                  <strong>Vehicle:</strong> {selectedTripDetails.vehicleDetails}
+                  <strong>Vehicle Assigned:</strong> {selectedTripDetails.vehicleDetails}
                 </p>
                 <p>
                   <strong>Driver:</strong> {selectedTripDetails.driverName || 'Unassigned'}

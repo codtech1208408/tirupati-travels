@@ -164,6 +164,38 @@ export const DriverApp = ({ onNavigateHome }) => {
     }
   };
 
+  const handleTripStatusUpdate = async (tripId, newStatus) => {
+    if (newStatus === 'Completed') {
+      const confirmEnd = window.confirm(
+        'Are you sure you want to End this Trip? Your trip completion date and time will be directly recorded and sent to dispatch.'
+      );
+      if (!confirmEnd) return;
+    }
+
+    try {
+      const res = await fetch(`/api/trips/${tripId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update trip status');
+
+      await fetchDriverData();
+      if (selectedTrip && selectedTrip.id === tripId) {
+        setSelectedTrip(data.trip);
+      }
+      if (newStatus === 'Completed') {
+        alert('Trip ended successfully! Trip End Date & Time has been recorded directly.');
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   const handleSaveExpense = async (e) => {
     e.preventDefault();
     if (!expenseForm.amount || !expenseForm.tripId) {
@@ -731,9 +763,23 @@ export const DriverApp = ({ onNavigateHome }) => {
 
                 <div>
                   <span className="font-bold text-slate-400 uppercase text-[11px] block">Schedule Timings</span>
-                  <p className="font-semibold text-slate-800 mt-1">
-                    {new Date(selectedTrip.startDate).toLocaleString()} → {new Date(selectedTrip.endDate).toLocaleString()}
-                  </p>
+                  <div className="mt-1 space-y-1">
+                    <p className="font-semibold text-slate-800">
+                      <strong>Start:</strong> {new Date(selectedTrip.startDate).toLocaleString()}
+                    </p>
+                    <p className="font-semibold text-slate-800">
+                      <strong>Trip End Date & Time:</strong>{' '}
+                      {selectedTrip.status === 'Completed' || selectedTrip.status === 'Closed' ? (
+                        <span className="text-emerald-700 font-bold">
+                          {new Date(selectedTrip.endDate || selectedTrip.endedAt || selectedTrip.completedAt).toLocaleString()} (Completed)
+                        </span>
+                      ) : (
+                        <span className="text-amber-600 font-medium">
+                          ⏳ In Progress (Recorded directly when you end the trip)
+                        </span>
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -749,13 +795,39 @@ export const DriverApp = ({ onNavigateHome }) => {
                 Drivers do not receive private phone numbers or personal documents.
               </div>
 
-              <div className="pt-2 flex justify-end">
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  {selectedTrip.status === 'Upcoming' && (
+                    <button
+                      onClick={() => handleTripStatusUpdate(selectedTrip.id, 'Ongoing')}
+                      className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md cursor-pointer"
+                    >
+                      <span>▶ Start Trip</span>
+                    </button>
+                  )}
+                  {selectedTrip.status === 'Ongoing' && (
+                    <button
+                      onClick={() => handleTripStatusUpdate(selectedTrip.id, 'Completed')}
+                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md cursor-pointer animate-pulse"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                      <span>End Trip (Complete Now)</span>
+                    </button>
+                  )}
+                  {(selectedTrip.status === 'Completed' || selectedTrip.status === 'Closed') && (
+                    <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Trip Finished & Ended Directly</span>
+                    </span>
+                  )}
+                </div>
+
                 <button
                   onClick={() => {
                     setExpenseForm((prev) => ({ ...prev, tripId: selectedTrip.id }));
                     setCurrentScreen('add_expense');
                   }}
-                  className="px-6 py-3 bg-[#1e1035] hover:bg-[#2a134a] text-white font-bold rounded-xl text-sm shadow-md flex items-center gap-2"
+                  className="px-5 py-2.5 bg-[#1e1035] hover:bg-[#2a134a] text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4 text-orange-400" />
                   <span>+ Add Expense Against This Trip</span>

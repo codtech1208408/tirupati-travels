@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard = ({ data, onNavigate }) => {
-  const { trips = [], packages = [], users = [], expenses = [], activityLogs = [] } = data;
+  const { trips = [], packages = [], users = [], expenses = [], activityLogs = [], vehicles = [] } = data;
 
   const drivers = users.filter((u) => u.role === 'driver');
   const managers = users.filter((u) => u.role === 'manager');
@@ -29,9 +29,9 @@ export const AdminDashboard = ({ data, onNavigate }) => {
   const cancelledCount = trips.filter((t) => t.status === 'Cancelled').length;
   const totalTrips = trips.length || 36; // fallback for initial display
 
-  // Total Vehicles: Unique vehicles in trips or registered fleet default
+  // Total Vehicles: Count of registered fleet vehicles or unique vehicles in trips
   const uniqueVehicles = [...new Set(trips.map((t) => t.vehicleDetails).filter(Boolean))];
-  const totalVehiclesCount = uniqueVehicles.length > 0 ? Math.max(uniqueVehicles.length, 18) : 18;
+  const totalVehiclesCount = vehicles.length > 0 ? vehicles.length : (uniqueVehicles.length > 0 ? uniqueVehicles.length : 5);
 
   // Total Earnings: Revenue generated from trips / booked packages
   const totalEarnings = trips.reduce((sum, t) => {
@@ -141,7 +141,7 @@ export const AdminDashboard = ({ data, onNavigate }) => {
 
         {/* 4. Total Vehicles */}
         <div
-          onClick={() => onNavigate('trips')}
+          onClick={() => onNavigate('vehicles')}
           className="bg-gradient-to-br from-indigo-700 via-purple-700 to-indigo-900 text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">

@@ -13,6 +13,7 @@ import {
 
 export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
   const [salary, setSalary] = useState(trip?.salary || 18000);
+  const [amount, setAmount] = useState(trip?.amount || 25000);
   const [closeNotes, setCloseNotes] = useState('');
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,7 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
   useEffect(() => {
     if (trip) {
       setSalary(trip.salary || 18000);
+      setAmount(trip.amount || 25000);
       // Fetch expenses for this trip
       const token = localStorage.getItem('tb_token');
       fetch(`/api/expenses?tripId=${trip.id}`, {
@@ -39,6 +41,7 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
   const totalApproved = approvedExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
   const totalPending = pendingExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
   const numSalary = Number(salary) || 0;
+  const numAmount = Number(amount) || 0;
   const totalCreditToWallet = numSalary; // Trip salary to credit
 
   const handleCloseDeal = async (e) => {
@@ -61,12 +64,13 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
         },
         body: JSON.stringify({
           salary: numSalary,
+          amount: numAmount,
           notes: closeNotes,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to close deal');
+      if (!res.ok) throw new Error(data.error || 'Failed to close project');
 
       onSuccess();
       onClose();
@@ -83,13 +87,13 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
         {/* Header */}
         <div className="bg-gradient-to-r from-[#1e1035] to-[#2b144d] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-orange-500 rounded-lg text-white">
-              <DollarSign className="w-5 h-5" />
+            <div className="p-2 bg-emerald-500 rounded-lg text-white">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-heading font-bold text-base sm:text-lg">Close Trip Deal & Credit Wallet</h3>
+              <h3 className="font-heading font-bold text-base sm:text-lg">Close Project & Assign Driver Salary</h3>
               <p className="text-xs text-purple-200">
-                Final settlement for {trip.id} • Driver: {trip.driverName || 'Assigned Driver'}
+                Final project settlement for {trip.id} • Driver: {trip.driverName || 'Assigned Driver'}
               </p>
             </div>
           </div>
@@ -110,15 +114,14 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
           <div className="p-3.5 bg-purple-50/70 border border-purple-200 rounded-xl text-xs text-purple-950 space-y-1">
             <div className="font-bold flex items-center gap-1.5 text-purple-900">
               <ShieldCheck className="w-4 h-4 text-purple-700" />
-              Deal Closing Workflow
+              Project Closing Workflow
             </div>
             <p className="text-[11px] text-purple-800 leading-relaxed">
-              1. Review driver expenses for this trip.
+              1. Review logged driver expenses and verify route completion.
               <br />
-              2. Enter the driver's contracted trip salary.
+              2. Assign the driver's trip remuneration salary and total project billing.
               <br />
-              3. Closing the deal changes trip status to <strong>Closed (read-only)</strong> and credits
-              the salary directly to the driver's digital wallet ledger.
+              3. Closing the project locks it as <strong>Closed (read-only)</strong> and instantly credits the driver's wallet.
             </p>
           </div>
 
@@ -149,35 +152,53 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Salary Input */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Driver Trip Salary Amount (₹) *
-            </label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">₹</span>
-              <input
-                type="number"
-                required
-                min="0"
-                value={salary}
-                onChange={(e) => setSalary(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-base font-heading font-bold text-slate-900 focus:ring-2 focus:ring-orange-500 outline-hidden"
-              />
+          {/* Project Billing Amount & Driver Salary Input */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Total Project Amount (₹)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-2 text-slate-400 font-bold text-sm">₹</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Total package booking revenue"
+                  className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-sm font-heading font-bold text-slate-900 focus:ring-2 focus:ring-orange-500 outline-hidden"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">Client tour package revenue</p>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
-              Agreed driver remuneration for completing the route {trip.route}
-            </p>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Driver Trip Salary (₹) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-2 text-slate-400 font-bold text-sm">₹</span>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={salary}
+                  onChange={(e) => setSalary(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-sm font-heading font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500 outline-hidden"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">Remuneration credited to driver</p>
+            </div>
           </div>
 
           {/* Closing Notes */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Deal Closing Remarks / Verification Notes
+              Closing Remarks & Feedback Notes
             </label>
             <textarea
               rows="2"
-              placeholder="Pilgrim feedback satisfactory, clean vehicle return, odometer verified..."
+              placeholder="Pilgrim feedback satisfactory, vehicle inspected, trip closed successfully..."
               value={closeNotes}
               onChange={(e) => setCloseNotes(e.target.value)}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
@@ -185,13 +206,13 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Net Credit Summary Card */}
-          <div className="p-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white flex items-center justify-between shadow-md">
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between shadow-md">
             <div className="flex items-center gap-2.5">
               <div className="p-2 bg-white/20 rounded-lg">
                 <Wallet className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-orange-100 uppercase tracking-wider">
+                <p className="text-[11px] font-semibold text-emerald-100 uppercase tracking-wider">
                   Net Wallet Credit to Driver
                 </p>
                 <p className="text-xs text-white/90">Instant ledger balance update</p>
@@ -207,17 +228,17 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50"
+              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-gradient-to-r from-purple-900 to-purple-950 hover:from-purple-950 hover:to-black text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>{loading ? 'Closing Deal...' : 'Confirm & Close Deal'}</span>
+              <CheckCircle2 className="w-4 h-4 text-white" />
+              <span>{loading ? 'Closing Project...' : 'Assign Salary & Close Project'}</span>
             </button>
           </div>
         </form>
