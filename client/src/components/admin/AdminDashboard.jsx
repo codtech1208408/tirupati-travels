@@ -64,12 +64,6 @@ export const AdminDashboard = ({ data, onNavigate }) => {
           >
             <span>+ Create New Trip</span>
           </button>
-          <button
-            onClick={() => onNavigate('expenses')}
-            className="px-4 py-2 bg-purple-900 hover:bg-purple-950 text-white rounded-xl text-xs font-semibold transition-all shadow-sm flex items-center gap-1.5"
-          >
-            <span>Review Expenses</span>
-          </button>
         </div>
       </div>
 
