@@ -660,16 +660,8 @@ export const TripManagement = ({
 
               {filteredTrips.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="p-8 text-center bg-slate-50/40">
-                    <div className="max-w-md mx-auto space-y-2">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
-                        <Calendar className="w-5 h-5" />
-                      </div>
-                      <p className="text-xs font-bold text-slate-700">No Trips in Dispatch</p>
-                      <p className="text-[11px] text-slate-500">
-                        Create trips in the <span className="font-semibold text-orange-600">Create New Trip</span> tab. Once a driver completes a trip in the Driver App, it will appear here as <span className="font-semibold text-blue-700">Completed</span> with an active <span className="font-semibold text-emerald-700">+ Add Salary</span> option.
-                      </p>
-                    </div>
+                  <td colSpan="7" className="p-8 text-center text-xs text-slate-400">
+                    No trips found
                   </td>
                 </tr>
               )}
