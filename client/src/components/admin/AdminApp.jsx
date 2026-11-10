@@ -114,12 +114,6 @@ export const AdminApp = ({ onNavigateHome }) => {
     { id: 'create_trip', label: 'Create New Trip', icon: PlusCircle, badge: 'New' },
     { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
     { id: 'vehicles', label: 'Fleet Vehicles', icon: Car, badge: `${vehicles.length || 0}` },
-    {
-      id: 'inquiries',
-      label: 'Inquiries & Leads',
-      icon: Sparkles,
-      badge: inquiries.filter((i) => i.status === 'New').length > 0 ? `${inquiries.filter((i) => i.status === 'New').length} New` : null,
-    },
     { id: 'users', label: 'Managers & Drivers', icon: ShieldCheck },
     { id: 'expenses', label: 'Expense Review', icon: Receipt },
     { id: 'salaries', label: 'Salaries & Settlements', icon: DollarSign },
@@ -181,8 +175,8 @@ export const AdminApp = ({ onNavigateHome }) => {
                   setIsMobileMenuOpen(false);
                 }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group ${isActive
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'text-purple-200 hover:bg-white/10 hover:text-white'
+                  ? 'bg-orange-500 text-white shadow-md'
+                  : 'text-purple-200 hover:bg-white/10 hover:text-white'
                   }`}
               >
                 <div className="flex items-center gap-3">
@@ -332,10 +326,6 @@ export const AdminApp = ({ onNavigateHome }) => {
               onRefresh={fetchData}
               role="admin"
             />
-          )}
-
-          {activeTab === 'inquiries' && (
-            <InquiriesManagement inquiries={inquiries} onRefresh={fetchData} />
           )}
 
           {activeTab === 'users' && (
