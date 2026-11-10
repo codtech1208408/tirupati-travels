@@ -167,7 +167,7 @@ export const CreateTripView = ({
   const handleCancel = () => {
     handleReset();
     if (onNavigate) {
-      onNavigate('trips');
+      onNavigate('dashboard');
     }
   };
 
