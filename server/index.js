@@ -1390,6 +1390,154 @@ app.post('/api/trips/:id/adjustment', authenticateToken, (req, res) => {
   res.json({ success: true, trip: sanitizeTripForRole(trip, 'admin'), walletBalance: newBalance });
 });
 
+// POST /api/trips/:id/settle-salary (Admin settles due salary for an individual completed trip)
+app.post('/api/trips/:id/settle-salary', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only Admin can settle driver salaries' });
+  }
+
+  const { paymentMode = 'UPI / Online Transfer', notes = 'Trip salary settlement' } = req.body;
+  const db = readDb();
+  const tripIdx = db.trips.findIndex((t) => t.id === req.params.id);
+  if (tripIdx === -1) return res.status(404).json({ error: 'Trip not found' });
+
+  const trip = db.trips[tripIdx];
+  const salaryAmount = Number(trip.salary) || 0;
+
+  trip.salaryStatus = 'Paid';
+  trip.salaryPaidAt = new Date().toISOString();
+  trip.salaryPaymentMode = paymentMode;
+  trip.salaryNotes = notes;
+
+  // Credit driver wallet if assigned
+  if (trip.driverId) {
+    const driverIdx = db.users.findIndex((u) => u.id === trip.driverId);
+    if (driverIdx !== -1) {
+      const driver = db.users[driverIdx];
+      driver.walletBalance = (Number(driver.walletBalance) || 0) + salaryAmount;
+      driver.totalEarnings = (Number(driver.totalEarnings) || 0) + salaryAmount;
+
+      // Add wallet transaction
+      const salaryTx = {
+        id: `WT-${Date.now()}-settle`,
+        driverId: driver.id,
+        tripId: trip.id,
+        type: 'credit',
+        category: 'Trip Salary Settled',
+        amount: salaryAmount,
+        date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        notes: `Salary settled for ${trip.id} via ${paymentMode}`,
+        balanceAfter: driver.walletBalance,
+        createdAt: new Date().toISOString(),
+      };
+      db.walletTransactions = [salaryTx, ...(db.walletTransactions || [])];
+      db.users[driverIdx] = driver;
+
+      // Notification
+      createNotification({
+        recipientRole: 'driver',
+        recipientId: driver.id,
+        title: 'Trip Salary Settled & Paid',
+        message: `Your salary of ₹${salaryAmount.toLocaleString()} for trip ${trip.id} has been settled via ${paymentMode}.`,
+        type: 'salary_paid',
+        tripId: trip.id,
+      });
+    }
+  }
+
+  db.trips[tripIdx] = trip;
+  writeDb(db);
+
+  logActivity(
+    req.user.id,
+    req.user.name,
+    'admin',
+    'SALARY_SETTLED',
+    `Settled ₹${salaryAmount} salary for trip ${trip.id} via ${paymentMode}`
+  );
+
+  res.json({
+    success: true,
+    message: `Trip ${trip.id} salary (₹${salaryAmount.toLocaleString()}) marked as Paid!`,
+    trip: sanitizeTripForRole(trip, 'admin'),
+  });
+});
+
+// POST /api/drivers/:id/settle-all-dues (Admin settles all pending salary dues for a driver in one click)
+app.post('/api/drivers/:id/settle-all-dues', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only Admin can settle driver salaries' });
+  }
+
+  const { paymentMode = 'UPI / Bank Transfer' } = req.body;
+  const db = readDb();
+  const driverId = req.params.id;
+  const driverIdx = db.users.findIndex((u) => u.id === driverId);
+  if (driverIdx === -1) return res.status(404).json({ error: 'Driver not found' });
+
+  const driver = db.users[driverIdx];
+  const pendingTrips = (db.trips || []).filter(
+    (t) => t.driverId === driverId && t.salaryStatus === 'Pending' && (Number(t.salary) > 0)
+  );
+
+  if (pendingTrips.length === 0) {
+    return res.status(400).json({ error: 'No pending salary dues found for this driver.' });
+  }
+
+  let totalSettled = 0;
+  pendingTrips.forEach((t) => {
+    t.salaryStatus = 'Paid';
+    t.salaryPaidAt = new Date().toISOString();
+    t.salaryPaymentMode = paymentMode;
+    totalSettled += Number(t.salary) || 0;
+  });
+
+  driver.walletBalance = (Number(driver.walletBalance) || 0) + totalSettled;
+  driver.totalEarnings = (Number(driver.totalEarnings) || 0) + totalSettled;
+
+  // Add ledger transaction
+  const bulkTx = {
+    id: `WT-${Date.now()}-bulk`,
+    driverId: driver.id,
+    type: 'credit',
+    category: 'Bulk Dues Settled',
+    amount: totalSettled,
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    notes: `All outstanding dues settled for ${pendingTrips.length} trip(s) via ${paymentMode}`,
+    balanceAfter: driver.walletBalance,
+    createdAt: new Date().toISOString(),
+  };
+
+  db.walletTransactions = [bulkTx, ...(db.walletTransactions || [])];
+  db.users[driverIdx] = driver;
+
+  createNotification({
+    recipientRole: 'driver',
+    recipientId: driver.id,
+    title: 'All Salary Dues Settled!',
+    message: `₹${totalSettled.toLocaleString()} in pending salary dues has been fully settled and paid to you via ${paymentMode}.`,
+    type: 'salary_paid',
+  });
+
+  writeDb(db);
+
+  logActivity(
+    req.user.id,
+    req.user.name,
+    'admin',
+    'BULK_SALARY_SETTLED',
+    `Settled ₹${totalSettled} in pending salary dues for driver ${driver.name} (${pendingTrips.length} trips)`
+  );
+
+  res.json({
+    success: true,
+    message: `Successfully settled ₹${totalSettled.toLocaleString()} in dues for ${driver.name}!`,
+    settledAmount: totalSettled,
+    tripsCount: pendingTrips.length,
+    driver,
+  });
+});
+
 /* ==========================================================================
    7. DRIVER EXPENSE ENTRY & REVIEW
    ========================================================================== */

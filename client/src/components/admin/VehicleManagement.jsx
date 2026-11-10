@@ -172,11 +172,10 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                statusFilter === st
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === st
                   ? 'bg-purple-900 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
-              }`}
+                }`}
             >
               {st === 'all' ? `All Vehicles (${vehicles.length})` : st}
             </button>
@@ -214,11 +213,10 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
                   <p className="text-xs text-slate-500 mt-0.5">{veh.model || veh.vehicleType}</p>
                 </div>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    veh.status === 'Active'
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${veh.status === 'Active'
                       ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                       : 'bg-amber-100 text-amber-800 border border-amber-200'
-                  }`}
+                    }`}
                 >
                   {veh.status || 'Active'}
                 </span>

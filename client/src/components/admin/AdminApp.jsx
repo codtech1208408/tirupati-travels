@@ -28,6 +28,7 @@ import { TripManagement } from './TripManagement';
 import { CreateTripView } from './CreateTripView';
 import { ExpenseReview } from './ExpenseReview';
 import { Reports } from './Reports';
+import { SalariesAndSettlements } from './SalariesAndSettlements';
 import { ActivityLogs } from './ActivityLogs';
 import { InquiriesManagement } from './InquiriesManagement';
 import { VehicleManagement } from './VehicleManagement';
@@ -342,12 +343,9 @@ export const AdminApp = ({ onNavigateHome }) => {
           )}
 
           {activeTab === 'salaries' && (
-            <TripManagement
-              trips={trips.filter((t) => t.status === 'Completed' || t.status === 'Closed')}
-              packages={packages}
-              clients={clients}
+            <SalariesAndSettlements
+              trips={trips}
               drivers={users.filter((u) => u.role === 'driver')}
-              vehicles={vehicles}
               onRefresh={fetchData}
               role="admin"
             />
