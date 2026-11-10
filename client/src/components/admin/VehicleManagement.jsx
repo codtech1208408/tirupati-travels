@@ -149,20 +149,22 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
         <div>
           <h2 className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight flex items-center gap-2">
             <Car className="w-6 h-6 text-orange-500" />
-            <span>Create Vehicle & Asset Registry</span>
+            <span>Vehicle Fleet Registry</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
             Register and manage tour vehicles, passenger capacities, and registration numbers for instant trip allocation
           </p>
         </div>
 
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>+ Create Vehicle</span>
-        </button>
+        {vehicles.length > 0 && (
+          <button
+            onClick={handleOpenAdd}
+            className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Register Vehicle</span>
+          </button>
+        )}
       </div>
 
       {/* Filter and Search Bar */}
@@ -264,10 +266,10 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
             <p className="text-xs font-semibold text-slate-600">No vehicles matching your criteria</p>
             <button
               onClick={handleOpenAdd}
-              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1"
+              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Register First Vehicle</span>
+              <span>Register Vehicle</span>
             </button>
           </div>
         )}
@@ -284,7 +286,7 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
                 </div>
                 <div>
                   <h3 className="font-heading font-bold text-base sm:text-lg">
-                    {editingVehicle ? `Edit Vehicle: ${editingVehicle.regNumber}` : 'Create New Fleet Vehicle'}
+                    {editingVehicle ? `Edit Vehicle: ${editingVehicle.regNumber}` : 'Register Vehicle'}
                   </h3>
                   <p className="text-[11px] text-purple-200">
                     Add vehicle details for allocation in trips
@@ -419,7 +421,7 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
                   disabled={loading}
                   className="px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 cursor-pointer"
                 >
-                  {loading ? 'Saving...' : editingVehicle ? 'Update Vehicle' : 'Create Vehicle'}
+                  {loading ? 'Saving...' : editingVehicle ? 'Update Vehicle' : 'Register Vehicle'}
                 </button>
               </div>
             </form>
