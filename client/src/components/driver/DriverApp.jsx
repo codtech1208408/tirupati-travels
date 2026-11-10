@@ -258,30 +258,8 @@ export const DriverApp = ({ onNavigateHome }) => {
     <div className="fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-slate-100 font-sans overscroll-none">
       {/* FIXED TOP HEADER: Never moves when scrolling, fully responsive on mobile */}
       <header className="sticky top-0 z-30 h-16 bg-[#1e1035] text-white px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-md gap-2">
-        {/* Left: Back button + Logo and App Title */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
-          {currentScreen !== 'dashboard' ? (
-            <button
-              type="button"
-              onClick={() => setCurrentScreen('dashboard')}
-              className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-200 hover:text-white transition-all shrink-0 cursor-pointer flex items-center gap-1"
-              title="Back to Dashboard"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 text-orange-400" />
-              <span className="text-xs font-bold hidden sm:inline">Back</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onNavigateHome}
-              className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-200 hover:text-white transition-all shrink-0 cursor-pointer flex items-center gap-1"
-              title="Return to Role Selection"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 text-orange-400" />
-              <span className="text-xs font-bold hidden sm:inline">Roles</span>
-            </button>
-          )}
-
+        {/* Left: Logo and App Title */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <div className="min-w-0 flex items-center overflow-hidden">
             <img
               src="/logo.png"

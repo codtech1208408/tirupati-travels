@@ -287,11 +287,10 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                statusFilter === st
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${statusFilter === st
                   ? 'bg-purple-900 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
-              }`}
+                }`}
             >
               {st === 'all' ? 'All Trips' : st}
             </button>
@@ -397,30 +396,28 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
                     <td className="px-4 py-3.5">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                          trip.status === 'Ongoing'
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${trip.status === 'Ongoing'
                             ? 'bg-orange-100 text-orange-800 border border-orange-200'
                             : trip.status === 'Completed'
-                            ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                            : trip.status === 'Closed'
-                            ? 'bg-purple-100 text-purple-900 border border-purple-200'
-                            : trip.status === 'Cancelled'
-                            ? 'bg-slate-100 text-slate-600'
-                            : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        }`}
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : trip.status === 'Closed'
+                                ? 'bg-purple-100 text-purple-900 border border-purple-200'
+                                : trip.status === 'Cancelled'
+                                  ? 'bg-slate-100 text-slate-600'
+                                  : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          }`}
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            trip.status === 'Ongoing'
+                          className={`w-1.5 h-1.5 rounded-full ${trip.status === 'Ongoing'
                               ? 'bg-orange-600 animate-pulse'
                               : trip.status === 'Completed'
-                              ? 'bg-blue-600'
-                              : trip.status === 'Closed'
-                              ? 'bg-purple-700'
-                              : trip.status === 'Cancelled'
-                              ? 'bg-slate-400'
-                              : 'bg-emerald-600'
-                          }`}
+                                ? 'bg-blue-600'
+                                : trip.status === 'Closed'
+                                  ? 'bg-purple-700'
+                                  : trip.status === 'Cancelled'
+                                    ? 'bg-slate-400'
+                                    : 'bg-emerald-600'
+                            }`}
                         ></span>
                         {trip.status}
                       </span>
@@ -432,9 +429,8 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                           ₹{(trip.salary || 0).toLocaleString()}
                         </span>
                         <span
-                          className={`text-[10px] font-bold uppercase ${
-                            trip.salaryStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'
-                          }`}
+                          className={`text-[10px] font-bold uppercase ${trip.salaryStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'
+                            }`}
                         >
                           {trip.salaryStatus || 'Pending'}
                         </span>
@@ -781,11 +777,10 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                       key={st}
                       disabled={selectedTripDetails.status === 'Closed'}
                       onClick={() => handleStatusChange(selectedTripDetails.id, st)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${
-                        selectedTripDetails.status === st
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${selectedTripDetails.status === st
                           ? 'bg-purple-900 text-white'
                           : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      }`}
+                        }`}
                     >
                       {st}
                     </button>

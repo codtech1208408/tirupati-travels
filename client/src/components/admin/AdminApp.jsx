@@ -218,30 +218,8 @@ export const AdminApp = ({ onNavigateHome }) => {
       <div className="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
         {/* FIXED HEADER: Never moves when scrolling, fully responsive on mobile */}
         <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs gap-2">
-          {/* Left: Back button + Mobile Menu Toggle + Company Logo + Current Tab */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
-            {activeTab !== 'dashboard' ? (
-              <button
-                type="button"
-                onClick={() => setActiveTab('dashboard')}
-                className="px-2 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-orange-50 hover:border-orange-200 text-slate-700 hover:text-orange-600 transition-all shrink-0 cursor-pointer flex items-center gap-1"
-                title="Back to Dashboard"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-orange-500" />
-                <span className="text-xs font-bold hidden sm:inline">Back</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={onNavigateHome}
-                className="px-2 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-orange-50 hover:border-orange-200 text-slate-700 hover:text-orange-600 transition-all shrink-0 cursor-pointer flex items-center gap-1"
-                title="Return to Role Selection"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-orange-500" />
-                <span className="text-xs font-bold hidden sm:inline">Roles</span>
-              </button>
-            )}
-
+          {/* Left: Mobile Menu Toggle + Company Logo + Current Tab */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="lg:hidden p-1.5 sm:p-2 rounded-lg text-slate-600 hover:bg-slate-100 shrink-0"
