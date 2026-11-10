@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { TripManagement } from '../admin/TripManagement';
+import { CreateTripView } from '../admin/CreateTripView';
 import { ExpenseReview } from '../admin/ExpenseReview';
 import { Reports } from '../admin/Reports';
 import { NotificationsDrawer } from '../common/NotificationsDrawer';
@@ -338,9 +339,20 @@ export const ManagerApp = ({ onNavigateHome }) => {
             </div>
           </div>
 
-          {(activeTab === 'trips' || activeTab === 'create_trip') && hasTripsPerm && (
+          {activeTab === 'create_trip' && hasTripsPerm && (
+            <CreateTripView
+              packages={packages}
+              drivers={drivers}
+              vehicles={vehicles}
+              trips={trips}
+              onRefresh={fetchData}
+              onNavigate={(tab) => setActiveTab(tab)}
+              role="manager"
+            />
+          )}
+
+          {activeTab === 'trips' && hasTripsPerm && (
             <TripManagement
-              key={activeTab}
               trips={trips}
               packages={packages}
               clients={[]}
@@ -348,7 +360,6 @@ export const ManagerApp = ({ onNavigateHome }) => {
               vehicles={vehicles}
               onRefresh={fetchData}
               role="manager"
-              initialOpenAdd={activeTab === 'create_trip'}
             />
           )}
 

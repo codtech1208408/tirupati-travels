@@ -414,14 +414,6 @@ export const TripManagement = ({
             Dispatch vehicles, assign available drivers with clash prevention, and track lifecycle to completion
           </p>
         </div>
-
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create New Trip</span>
-        </button>
       </div>
 
       {/* Filter and Status Pills Bar */}

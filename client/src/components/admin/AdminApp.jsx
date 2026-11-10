@@ -25,6 +25,7 @@ import { UserManagement } from './UserManagement';
 import { PackageManagement } from './PackageManagement';
 import { ClientManagement } from './ClientManagement';
 import { TripManagement } from './TripManagement';
+import { CreateTripView } from './CreateTripView';
 import { ExpenseReview } from './ExpenseReview';
 import { Reports } from './Reports';
 import { ActivityLogs } from './ActivityLogs';
@@ -309,9 +310,20 @@ export const AdminApp = ({ onNavigateHome }) => {
             <VehicleManagement vehicles={vehicles} onRefresh={fetchData} role="admin" />
           )}
 
-          {(activeTab === 'trips' || activeTab === 'create_trip') && (
+          {activeTab === 'create_trip' && (
+            <CreateTripView
+              packages={packages}
+              drivers={users.filter((u) => u.role === 'driver')}
+              vehicles={vehicles}
+              trips={trips}
+              onRefresh={fetchData}
+              onNavigate={(tab) => setActiveTab(tab)}
+              role="admin"
+            />
+          )}
+
+          {activeTab === 'trips' && (
             <TripManagement
-              key={activeTab}
               trips={trips}
               packages={packages}
               clients={clients}
@@ -319,7 +331,6 @@ export const AdminApp = ({ onNavigateHome }) => {
               vehicles={vehicles}
               onRefresh={fetchData}
               role="admin"
-              initialOpenAdd={activeTab === 'create_trip'}
             />
           )}
 
