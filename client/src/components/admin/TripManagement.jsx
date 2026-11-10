@@ -39,9 +39,11 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     name: '',
     packageId: '',
     clientId: '',
+    clientName: '',
+    clientMobile: '',
     travellersCount: 4,
     pickupLocation: 'Tirupati Railway Station',
-    dropLocation: 'Alipiri Gate / Tirumala',
+    dropLocation: 'Sightseeing / Destination',
     startDate: '',
     endDate: '',
     route: 'Tirupati Circuit',
@@ -73,42 +75,52 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
   // Helper: check if a driver is busy on given dates
   const isDriverBusy = (driverId, startDate, endDate, excludeTripId = null) => {
-    if (!driverId || !startDate || !endDate) return false;
+    if (!driverId || !startDate) return false;
     const start = new Date(startDate).getTime();
-    const end = new Date(endDate).getTime();
+    const end = endDate ? new Date(endDate).getTime() : start;
 
     return trips.some((t) => {
       if (t.id === excludeTripId) return false;
       if (t.driverId !== driverId) return false;
       if (t.status === 'Cancelled' || t.status === 'Closed') return false;
       const tStart = new Date(t.startDate).getTime();
-      const tEnd = new Date(t.endDate).getTime();
+      const tEnd = new Date(t.endDate || t.startDate).getTime();
       return start <= tEnd && end >= tStart;
     });
   };
+
+  // Available drivers only: not deactivated, not on trip/unavailable, and no date clashes
+  const availableDrivers = drivers.filter((drv) => {
+    if (drv.status === 'deactivated') return false;
+    if (editingTrip && drv.id === editingTrip.driverId) return true;
+    if (drv.availability === 'On Trip' || drv.availability === 'Unavailable') return false;
+    const busy = isDriverBusy(drv.id, formData.startDate, formData.startDate, editingTrip?.id);
+    return !busy;
+  });
 
   const handleOpenAdd = () => {
     setEditingTrip(null);
     setDateClashError('');
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const dayAfter = new Date();
-    dayAfter.setDate(dayAfter.getDate() + 3);
+    const dateStr = tomorrow.toISOString().slice(0, 16);
 
     setFormData({
       name: packages[0]?.name || 'Tirupati Darshan Package',
       packageId: packages[0]?.id || '',
-      clientId: clients[0]?.id || '',
+      clientId: '',
+      clientName: '',
+      clientMobile: '',
       travellersCount: 4,
       pickupLocation: 'Tirupati Central Railway Station',
-      dropLocation: 'Alipiri Gate / Hotel Bliss',
-      startDate: tomorrow.toISOString().slice(0, 16),
-      endDate: dayAfter.toISOString().slice(0, 16),
+      dropLocation: 'Sightseeing / Destination',
+      startDate: dateStr,
+      endDate: dateStr,
       route: packages[0]?.route || 'Hyderabad → Tirupati → Tirumala',
       stops: 'Alipiri, Srinivasa Mangapuram, Kapila Theertham',
       vehicleDetails: 'Tempo Traveller Luxury AC (AP 39 AB 1234)',
       instructions: 'Confirm pickup 1 hour prior. Ensure luggage space is clean.',
-      driverId: drivers[0]?.id || '',
+      driverId: '',
       salary: 16000,
       notes: 'VIP pilgrimage booking.',
     });
@@ -118,21 +130,24 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
   const handleOpenEdit = (trip) => {
     setEditingTrip(trip);
     setDateClashError('');
+    const startDateStr = trip.startDate ? trip.startDate.slice(0, 16) : '';
     setFormData({
       name: trip.name,
       packageId: trip.packageId || '',
       clientId: trip.clientId || '',
+      clientName: trip.clientName || trip.client?.name || '',
+      clientMobile: trip.clientMobile || trip.client?.phone || '',
       travellersCount: trip.travellersCount || 4,
       pickupLocation: trip.pickupLocation,
-      dropLocation: trip.dropLocation,
-      startDate: trip.startDate ? trip.startDate.slice(0, 16) : '',
-      endDate: trip.endDate ? trip.endDate.slice(0, 16) : '',
+      dropLocation: trip.dropLocation || 'Sightseeing / Destination',
+      startDate: startDateStr,
+      endDate: trip.endDate ? trip.endDate.slice(0, 16) : startDateStr,
       route: trip.route,
       stops: trip.stops || '',
       vehicleDetails: trip.vehicleDetails || '',
       instructions: trip.instructions || '',
       driverId: trip.driverId || '',
-      salary: trip.salary || 0,
+      salary: trip.salary || 16000,
       notes: trip.notes || '',
     });
     setIsAddModalOpen(true);
@@ -142,8 +157,10 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     e.preventDefault();
     setDateClashError('');
 
+    const effectiveEndDate = formData.startDate;
+
     // Pre-check date clash on client
-    if (formData.driverId && isDriverBusy(formData.driverId, formData.startDate, formData.endDate, editingTrip?.id)) {
+    if (formData.driverId && isDriverBusy(formData.driverId, formData.startDate, effectiveEndDate, editingTrip?.id)) {
       const busyDriver = drivers.find((d) => d.id === formData.driverId);
       setDateClashError(
         `Double-booking prevented: Driver ${busyDriver?.name || 'selected'} is already assigned to another active trip during these dates!`
@@ -156,13 +173,19 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
     const method = editingTrip ? 'PUT' : 'POST';
 
     try {
+      const payload = {
+        ...formData,
+        endDate: effectiveEndDate,
+        clientName: formData.clientName.trim(),
+        clientMobile: formData.clientMobile.trim(),
+      };
       const res = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -222,10 +245,14 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
   const filteredTrips = trips.filter((t) => {
     const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
+    const clientName = t.clientName || t.client?.name || '';
+    const clientMobile = t.clientMobile || t.client?.phone || '';
     const matchesSearch =
       t.id.toLowerCase().includes(search.toLowerCase()) ||
       t.name.toLowerCase().includes(search.toLowerCase()) ||
       (t.driverName && t.driverName.toLowerCase().includes(search.toLowerCase())) ||
+      clientName.toLowerCase().includes(search.toLowerCase()) ||
+      clientMobile.includes(search) ||
       t.route.toLowerCase().includes(search.toLowerCase());
     return matchesStatus && matchesSearch;
   });
@@ -245,7 +272,7 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
         <button
           onClick={handleOpenAdd}
-          className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto"
+          className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Create New Trip</span>
@@ -276,7 +303,7 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
-            placeholder="Search by ID, route, driver..."
+            placeholder="Search by ID, route, client, driver..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
@@ -290,8 +317,8 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-semibold text-[11px]">
               <tr>
-                <th className="px-5 py-3">Trip & Package</th>
-                <th className="px-4 py-3">Schedule / Dates</th>
+                <th className="px-5 py-3">Trip & Client</th>
+                <th className="px-4 py-3">Schedule / Date</th>
                 <th className="px-4 py-3">Assigned Driver</th>
                 <th className="px-4 py-3">Vehicle Details</th>
                 <th className="px-4 py-3">Status</th>
@@ -302,17 +329,20 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
             <tbody className="divide-y divide-slate-100">
               {filteredTrips.map((trip) => {
                 const isClosed = trip.status === 'Closed';
+                const clientDisplayName = trip.clientName || trip.client?.name;
+                const clientDisplayMobile = trip.clientMobile || trip.client?.phone;
                 return (
                   <tr key={trip.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-5 py-3.5">
                       <div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-mono font-bold text-slate-900 text-xs">
                             {trip.id}
                           </span>
-                          {role === 'admin' && trip.client && (
-                            <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-sm">
-                              {trip.client.name}
+                          {clientDisplayName && (
+                            <span className="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded-sm font-medium">
+                              👤 {clientDisplayName}
+                              {clientDisplayMobile ? ` (${clientDisplayMobile})` : ''}
                             </span>
                           )}
                         </div>
@@ -330,14 +360,16 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                             year: 'numeric',
                           })}
                         </span>
-                        <span className="text-[11px] text-slate-400 block">
-                          to{' '}
-                          {new Date(trip.endDate).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </span>
+                        {trip.endDate && new Date(trip.endDate).toDateString() !== new Date(trip.startDate).toDateString() && (
+                          <span className="text-[11px] text-slate-400 block">
+                            to{' '}
+                            {new Date(trip.endDate).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </span>
+                        )}
                       </div>
                     </td>
 
@@ -493,7 +525,38 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                 </div>
               )}
 
-              {/* Package & Client Selection */}
+              {/* Client Name (Manual) & Client Mobile Number */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Client Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.clientName}
+                    onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                    placeholder="Enter client / traveller name"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Client Mobile Number *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={formData.clientMobile}
+                    onChange={(e) => setFormData({ ...formData, clientMobile: e.target.value })}
+                    placeholder="e.g. +91 98480 12345"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Package & Trip Name Selection */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -515,28 +578,6 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Client / Traveller Group *
-                  </label>
-                  <select
-                    required
-                    value={formData.clientId}
-                    onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  >
-                    <option value="">-- Choose Client --</option>
-                    {clients.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.travellersCount} travellers)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Trip Name & Route */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Trip Name *
                   </label>
                   <input
@@ -544,10 +585,14 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g. Tirupati Darshan Package"
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
                   />
                 </div>
+              </div>
 
+              {/* Route & Trip Start Date */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Travel Route *
@@ -557,13 +602,11 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     required
                     value={formData.route}
                     onChange={(e) => setFormData({ ...formData, route: e.target.value })}
+                    placeholder="e.g. Tirupati Circuit / Tirumala"
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
                   />
                 </div>
-              </div>
 
-              {/* Start & End Dates with Time */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Trip Start Date & Time *
@@ -572,29 +615,16 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     type="datetime-local"
                     required
                     value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Trip End Date & Time *
-                  </label>
-                  <input
-                    type="datetime-local"
-                    required
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
                   />
                 </div>
               </div>
 
-              {/* Driver Assignment with Live Conflict Detection */}
+              {/* Driver Assignment: Available Drivers Only */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Assign Driver (Live Schedule & Conflict Check)
+                  Assign Driver ({availableDrivers.length} Available)
                 </label>
                 <select
                   value={formData.driverId}
@@ -602,26 +632,24 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
                 >
                   <option value="">-- No Driver (Assign Later) --</option>
-                  {drivers.map((drv) => {
-                    const busy = isDriverBusy(
-                      drv.id,
-                      formData.startDate,
-                      formData.endDate,
-                      editingTrip?.id
-                    );
-                    return (
-                      <option key={drv.id} value={drv.id} disabled={busy}>
-                        {drv.name} - {busy ? '⚠️ BUSY (Dates Conflict)' : '✓ AVAILABLE'}
-                      </option>
-                    );
-                  })}
+                  {availableDrivers.map((drv) => (
+                    <option key={drv.id} value={drv.id}>
+                      {drv.name} ({drv.mobile || 'Pilot'}) - Available
+                    </option>
+                  ))}
                 </select>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Double booking prevention: drivers with overlapping trip dates are automatically disabled.
-                </p>
+                {availableDrivers.length === 0 ? (
+                  <p className="text-[11px] text-amber-600 mt-1">
+                    ⚠️ No drivers are currently available for this date/time. You can leave unassigned and allocate later.
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-emerald-600 mt-1">
+                    ✓ Showing only available drivers with no conflicting trip schedule.
+                  </p>
+                )}
               </div>
 
-              {/* Pickup & Drop Locations */}
+              {/* Pickup Location & Vehicle Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -631,25 +659,11 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     type="text"
                     value={formData.pickupLocation}
                     onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
+                    placeholder="e.g. Tirupati Railway Station"
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Drop Location
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.dropLocation}
-                    onChange={(e) => setFormData({ ...formData, dropLocation: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
-                </div>
-              </div>
-
-              {/* Vehicle & Salary */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Vehicle Details & Reg Number
@@ -658,24 +672,13 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                     type="text"
                     value={formData.vehicleDetails}
                     onChange={(e) => setFormData({ ...formData, vehicleDetails: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Driver Trip Salary (₹)
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.salary}
-                    onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                    placeholder="e.g. Tempo Traveller (AP 39 AB 1234)"
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
                   />
                 </div>
               </div>
 
-              {/* Instructions */}
+              {/* Instructions & Stops */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Driver Instructions & Stops
@@ -684,6 +687,7 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                   rows="2"
                   value={formData.instructions}
                   onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                  placeholder="Special instructions or pilgrimage stops..."
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 outline-hidden"
                 ></textarea>
               </div>
@@ -738,15 +742,25 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
             <div className="space-y-2.5 text-xs">
               <div className="p-3 bg-slate-50 rounded-xl space-y-1.5 border border-slate-200">
                 <p>
-                  <strong>Dates:</strong> {new Date(selectedTripDetails.startDate).toLocaleString()} →{' '}
-                  {new Date(selectedTripDetails.endDate).toLocaleString()}
+                  <strong>Date:</strong> {new Date(selectedTripDetails.startDate).toLocaleString()}
+                  {selectedTripDetails.endDate && new Date(selectedTripDetails.endDate).toDateString() !== new Date(selectedTripDetails.startDate).toDateString() && (
+                    <> → {new Date(selectedTripDetails.endDate).toLocaleString()}</>
+                  )}
                 </p>
+                {(selectedTripDetails.clientName || selectedTripDetails.client?.name) && (
+                  <p>
+                    <strong>Client:</strong> {selectedTripDetails.clientName || selectedTripDetails.client?.name}
+                    {(selectedTripDetails.clientMobile || selectedTripDetails.client?.phone) ? ` (${selectedTripDetails.clientMobile || selectedTripDetails.client?.phone})` : ''}
+                  </p>
+                )}
                 <p>
                   <strong>Pickup:</strong> {selectedTripDetails.pickupLocation}
                 </p>
-                <p>
-                  <strong>Drop:</strong> {selectedTripDetails.dropLocation}
-                </p>
+                {selectedTripDetails.dropLocation && selectedTripDetails.dropLocation !== 'Sightseeing / Destination' && (
+                  <p>
+                    <strong>Drop:</strong> {selectedTripDetails.dropLocation}
+                  </p>
+                )}
                 <p>
                   <strong>Vehicle:</strong> {selectedTripDetails.vehicleDetails}
                 </p>

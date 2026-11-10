@@ -688,17 +688,18 @@ app.delete('/api/clients/:id', authenticateToken, requireAdminForClients, (req, 
    5. TRIP MANAGEMENT & DRIVER ASSIGNMENT (WITH PRIVACY SANITIZATION)
    ========================================================================== */
 
-// Helper: Sanitize trip for non-admin users (Manager, Driver)
+// Helper: Sanitize trip for non-admin users (Driver)
 function sanitizeTripForRole(trip, role) {
-  if (role === 'admin') return trip;
+  if (role === 'admin' || role === 'manager') return trip;
 
   // Clone trip
   const sanitized = { ...trip };
-  // Never expose client personal contact details
+  // Never expose client personal contact details to drivers
   delete sanitized.client;
   delete sanitized.clientId;
   sanitized.clientName = 'Pilgrim Group';
   sanitized.clientPhone = 'Confidential (Admin Managed)';
+  sanitized.clientMobile = 'Confidential (Admin Managed)';
   sanitized.clientEmail = 'Confidential';
   return sanitized;
 }
@@ -780,6 +781,8 @@ app.post('/api/trips', authenticateToken, (req, res) => {
     name,
     packageId,
     clientId,
+    clientName,
+    clientMobile,
     pickupLocation,
     dropLocation,
     startDate,
@@ -794,8 +797,10 @@ app.post('/api/trips', authenticateToken, (req, res) => {
     notes,
   } = req.body;
 
-  if (!name || !startDate || !endDate) {
-    return res.status(400).json({ error: 'Trip name, start date and end date are required' });
+  const effectiveEndDate = endDate || startDate;
+
+  if (!name || !startDate) {
+    return res.status(400).json({ error: 'Trip name and start date are required' });
   }
 
   const db = readDb();
@@ -809,7 +814,7 @@ app.post('/api/trips', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Selected driver is deactivated' });
     }
 
-    const hasClash = checkDriverDateClash(db.trips || [], driverId, startDate, endDate);
+    const hasClash = checkDriverDateClash(db.trips || [], driverId, startDate, effectiveEndDate);
     if (hasClash) {
       return res.status(400).json({
         error: `Driver ${driver.name} is already assigned to another active trip during this date range! Prevented double booking.`,
@@ -825,11 +830,13 @@ app.post('/api/trips', authenticateToken, (req, res) => {
     name: name.trim(),
     packageId: packageId || null,
     clientId: clientId || null,
+    clientName: clientName ? clientName.trim() : null,
+    clientMobile: clientMobile ? clientMobile.trim() : null,
     travellersCount: Number(travellersCount) || 1,
     pickupLocation: pickupLocation || 'Tirupati Railway Station',
-    dropLocation: dropLocation || 'Alipiri Gate / Hotel',
+    dropLocation: dropLocation || 'Sightseeing / Destination',
     startDate,
-    endDate,
+    endDate: effectiveEndDate,
     route: route || 'Tirupati Circuit',
     stops: stops || 'Tirumala, Alipiri',
     vehicleDetails: vehicleDetails || 'Tempo Traveller',
@@ -902,7 +909,7 @@ app.put('/api/trips/:id', authenticateToken, (req, res) => {
 
   const newDriverId = req.body.driverId !== undefined ? req.body.driverId : existing.driverId;
   const newStartDate = req.body.startDate || existing.startDate;
-  const newEndDate = req.body.endDate || existing.endDate;
+  const newEndDate = req.body.endDate || (req.body.startDate ? req.body.startDate : existing.endDate);
 
   // If driver assigned or dates changed, check date clash
   let newDriverName = existing.driverName;
