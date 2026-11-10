@@ -156,11 +156,10 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                statusFilter === st
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${statusFilter === st
                   ? 'bg-purple-900 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
-              }`}
+                }`}
             >
               {st === 'all' ? 'All Statuses' : st}
             </button>
@@ -281,15 +280,14 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
 
                   <td className="px-4 py-3.5">
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        exp.status === 'Approved'
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${exp.status === 'Approved'
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           : exp.status === 'Rejected'
-                          ? 'bg-red-50 text-red-700 border border-red-200'
-                          : exp.status === 'Flagged'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : 'bg-blue-50 text-blue-700 border border-blue-200'
-                      }`}
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : exp.status === 'Flagged'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        }`}
                     >
                       {exp.status}
                     </span>
@@ -354,11 +352,10 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
 
             <form onSubmit={handleSaveReview} className="p-6 space-y-4 text-xs">
               <div
-                className={`p-3 rounded-xl border flex items-center justify-between ${
-                  reviewModalExpense.paidBy === 'passenger'
+                className={`p-3 rounded-xl border flex items-center justify-between ${reviewModalExpense.paidBy === 'passenger'
                     ? 'bg-blue-50 border-blue-200 text-blue-900'
                     : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                }`}
+                  }`}
               >
                 <div>
                   <span className="font-bold block text-xs">
@@ -383,15 +380,14 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
                       type="button"
                       key={st}
                       onClick={() => setReviewStatus(st)}
-                      className={`py-2 px-3 rounded-xl font-bold border transition-all ${
-                        reviewStatus === st
+                      className={`py-2 px-3 rounded-xl font-bold border transition-all ${reviewStatus === st
                           ? st === 'Approved'
                             ? 'bg-emerald-600 text-white border-emerald-600'
                             : st === 'Rejected'
-                            ? 'bg-red-600 text-white border-red-600'
-                            : 'bg-amber-500 text-white border-amber-500'
+                              ? 'bg-red-600 text-white border-red-600'
+                              : 'bg-amber-500 text-white border-amber-500'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       {st}
                     </button>

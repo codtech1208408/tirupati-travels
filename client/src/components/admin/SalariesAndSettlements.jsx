@@ -96,8 +96,8 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
       statusFilter === 'all'
         ? true
         : statusFilter === 'due'
-        ? d.duesPending > 0
-        : d.duesPending === 0 && d.salaryEarned > 0;
+          ? d.duesPending > 0
+          : d.duesPending === 0 && d.salaryEarned > 0;
     return matchesSearch && matchesStatus;
   });
 
@@ -331,21 +331,19 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
                 setSelectedDriverId('all');
                 setStatusFilter('all');
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                selectedDriverId === 'all' && statusFilter === 'all'
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${selectedDriverId === 'all' && statusFilter === 'all'
                   ? 'bg-purple-900 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+                }`}
             >
               All Drivers ({driverStats.length})
             </button>
             <button
               onClick={() => setStatusFilter(statusFilter === 'due' ? 'all' : 'due')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 ${
-                statusFilter === 'due'
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 ${statusFilter === 'due'
                   ? 'bg-amber-600 text-white shadow-xs'
                   : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
-              }`}
+                }`}
             >
               <span>Has Dues</span>
               <span className="px-1.5 py-0.2 bg-white/30 rounded-full text-[10px]">
@@ -363,11 +361,10 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
               <div
                 key={drv.id}
                 onClick={() => setSelectedDriverId(isSelected ? 'all' : drv.id)}
-                className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
+                className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${isSelected
                     ? 'border-orange-500 bg-orange-50/40 ring-2 ring-orange-400/50 shadow-md'
                     : 'border-slate-200 hover:border-orange-300 bg-white hover:bg-slate-50/70 shadow-xs'
-                }`}
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -422,9 +419,8 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
                       Due Amount
                     </span>
                     <span
-                      className={`font-heading font-bold text-xs ${
-                        drv.duesPending > 0 ? 'text-amber-600' : 'text-emerald-600'
-                      }`}
+                      className={`font-heading font-bold text-xs ${drv.duesPending > 0 ? 'text-amber-600' : 'text-emerald-600'
+                        }`}
                     >
                       ₹{drv.duesPending.toLocaleString()}
                     </span>
