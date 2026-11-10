@@ -363,8 +363,8 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 
 // GET /api/users
 app.get('/api/users', authenticateToken, (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Access required' });
   }
   const { role } = req.query;
   const db = readDb();
@@ -372,7 +372,9 @@ app.get('/api/users', authenticateToken, (req, res) => {
   if (role) {
     users = users.filter((u) => u.role === role);
   }
-  res.json({ users });
+  // Sanitize sensitive fields
+  const sanitized = users.map(({ password, ...u }) => u);
+  res.json({ users: sanitized });
 });
 
 // POST /api/users
@@ -716,8 +718,8 @@ app.post('/api/vehicles', authenticateToken, (req, res) => {
 
 // PUT /api/vehicles/:id
 app.put('/api/vehicles/:id', authenticateToken, (req, res) => {
-  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
-    return res.status(403).json({ error: 'Admin or Manager access required' });
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only Super Admin has permission to edit vehicle details' });
   }
 
   const db = readDb();
@@ -1062,12 +1064,9 @@ app.put('/api/trips/:id', authenticateToken, (req, res) => {
     });
   }
 
-  // Manager check
-  if (req.user.role === 'manager') {
-    const perms = req.user.permissions || [];
-    if (!perms.includes('assign_drivers') && req.body.driverId !== undefined) {
-      return res.status(403).json({ error: 'Permission denied: Cannot assign driver.' });
-    }
+  // Edit trips is restricted to Admin only
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Permission denied: Only Admin has permission to edit trips.' });
   }
 
   const newDriverId = req.body.driverId !== undefined ? req.body.driverId : existing.driverId;

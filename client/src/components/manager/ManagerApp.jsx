@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
+  LayoutDashboard,
   Calendar,
+  Car,
   Receipt,
+  DollarSign,
   FileText,
-  ShieldAlert,
   ShieldCheck,
-  Lock,
   LogOut,
   Menu,
   X,
@@ -15,68 +16,70 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { TripManagement } from '../admin/TripManagement';
+import { AdminDashboard } from '../admin/AdminDashboard';
 import { CreateTripView } from '../admin/CreateTripView';
+import { TripManagement } from '../admin/TripManagement';
+import { VehicleManagement } from '../admin/VehicleManagement';
+import { UserManagement } from '../admin/UserManagement';
 import { ExpenseReview } from '../admin/ExpenseReview';
+import { SalariesAndSettlements } from '../admin/SalariesAndSettlements';
 import { Reports } from '../admin/Reports';
 import { NotificationsDrawer } from '../common/NotificationsDrawer';
 
 export const ManagerApp = ({ onNavigateHome }) => {
   const { user, token, logout, unreadCount } = useAuth();
-  const permissions = user?.permissions || [];
 
-  // Allowed tabs based on permissions
-  const hasTripsPerm = permissions.includes('view_trips');
-  const hasExpensePerm = permissions.includes('review_expenses');
-  const hasReportsPerm = permissions.includes('view_reports');
-
-  const [activeTab, setActiveTab] = useState(
-    hasTripsPerm ? 'trips' : hasExpensePerm ? 'expenses' : hasReportsPerm ? 'reports' : 'no_access'
-  );
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   // Data
   const [trips, setTrips] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [drivers, setDrivers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const [tripsRes, pkgsRes, expRes, usersRes, vehRes] = await Promise.all([
+      const [tripsRes, pkgsRes, expRes, usersRes, vehRes, logsRes] = await Promise.all([
         fetch('/api/trips', { headers }),
         fetch('/api/packages'),
         fetch('/api/expenses', { headers }),
-        fetch('/api/users?role=driver', { headers }),
+        fetch('/api/users', { headers }),
         fetch('/api/vehicles'),
+        fetch('/api/activity-logs', { headers }).catch(() => null),
       ]);
 
-      if (tripsRes.ok) {
+      if (tripsRes && tripsRes.ok) {
         const d = await tripsRes.json();
         setTrips(d.trips || []);
       }
-      if (pkgsRes.ok) {
+      if (pkgsRes && pkgsRes.ok) {
         const d = await pkgsRes.json();
         setPackages(d.packages || []);
       }
-      if (expRes.ok) {
+      if (expRes && expRes.ok) {
         const d = await expRes.json();
         setExpenses(d.expenses || []);
       }
-      if (usersRes.ok) {
+      if (usersRes && usersRes.ok) {
         const d = await usersRes.json();
-        setDrivers(d.users || []);
+        setUsers(d.users || []);
       }
       if (vehRes && vehRes.ok) {
         const d = await vehRes.json();
         setVehicles(d.vehicles || []);
       }
+      if (logsRes && logsRes.ok) {
+        const d = await logsRes.json();
+        setActivityLogs(d.logs || []);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching manager data:', err);
     } finally {
       setLoading(false);
     }
@@ -86,17 +89,32 @@ export const ManagerApp = ({ onNavigateHome }) => {
     fetchData();
   }, [token]);
 
+  const drivers = users.filter((u) => u.role === 'driver');
+
+  // Exact same tabs as Admin Dashboard
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'create_trip', label: 'Create New Trip', icon: PlusCircle, badge: 'New' },
+    { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
+    { id: 'vehicles', label: 'Create Vehicle', icon: Car, badge: `${vehicles.length || 0}` },
+    { id: 'users', label: 'Managers & Drivers', icon: ShieldCheck },
+    { id: 'expenses', label: 'Expense Review', icon: Receipt },
+    { id: 'salaries', label: 'Salaries & Settlements', icon: DollarSign },
+    { id: 'reports', label: 'Reports & Export', icon: FileText },
+  ];
+
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden flex bg-slate-100 font-sans overscroll-none">
-      {/* FIXED LEFT SIDEBAR (No scrolling away, duplicate logo removed) */}
+      {/* FIXED LEFT SIDEBAR */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1b1030] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
-          }`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1e1035] text-white flex flex-col shrink-0 border-r border-purple-900/60 transition-transform duration-300 lg:static lg:translate-x-0 h-full ${
+          isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        }`}
       >
-        {/* Header - No duplicate logo */}
+        {/* Sidebar Header */}
         <div className="p-4 border-b border-purple-900/50 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-purple-400" />
+            <ShieldCheck className="w-5 h-5 text-orange-400" />
             <span className="font-heading font-extrabold text-sm text-white tracking-wider">
               MANAGER SUITE
             </span>
@@ -115,120 +133,54 @@ export const ManagerApp = ({ onNavigateHome }) => {
             <img
               src={user?.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'}
               alt={user?.name}
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-purple-500"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-orange-500"
             />
             <div className="min-w-0">
               <p className="font-semibold text-xs text-white truncate">{user?.name || 'Operations Manager'}</p>
               <p className="text-[10px] text-purple-300 truncate">{user?.email}</p>
-              <span className="inline-block mt-0.5 px-2 py-0.2 rounded-full bg-purple-500/20 text-purple-300 text-[9px] font-bold uppercase">
-                Delegated Access
+              <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-[9px] font-bold uppercase tracking-wider">
+                Manager (Read Only)
               </span>
             </div>
           </div>
         </div>
 
-        {/* Permissions Granted Pills */}
-        <div className="p-3 border-b border-purple-900/30 shrink-0">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-            Admin Permitted Actions
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {permissions.map((p) => (
-              <span
-                key={p}
-                className="text-[9px] px-2 py-0.5 rounded-md bg-purple-900/70 text-orange-300 font-medium"
-              >
-                ✓ {p.replace('_', ' ')}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation Items (Only permitted items show) */}
+        {/* All Tabs Navigation (Matching Admin Panel) */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-          {hasTripsPerm && (
-            <button
-              onClick={() => {
-                setActiveTab('create_trip');
-                setIsMobileMenuOpen(false);
-              }}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'create_trip'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'text-purple-200 hover:bg-white/10 hover:text-white'
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'text-purple-200 hover:bg-white/10 hover:text-white'
                 }`}
-            >
-              <div className="flex items-center gap-3">
-                <PlusCircle className="w-4 h-4" />
-                <span>Create New Trip</span>
-              </div>
-              <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-900/80 text-orange-300 uppercase font-bold">
-                New
-              </span>
-            </button>
-          )}
-
-          {hasTripsPerm ? (
-            <button
-              onClick={() => {
-                setActiveTab('trips');
-                setIsMobileMenuOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'trips'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'text-purple-200 hover:bg-white/10 hover:text-white'
-                }`}
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Trips & Dispatch</span>
-            </button>
-          ) : (
-            <div className="px-3.5 py-2 text-xs text-slate-500 flex items-center gap-2 cursor-not-allowed opacity-50">
-              <Lock className="w-3.5 h-3.5" />
-              <span>Trips (Locked by Admin)</span>
-            </div>
-          )}
-
-          {hasExpensePerm ? (
-            <button
-              onClick={() => {
-                setActiveTab('expenses');
-                setIsMobileMenuOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'expenses'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'text-purple-200 hover:bg-white/10 hover:text-white'
-                }`}
-            >
-              <Receipt className="w-4 h-4" />
-              <span>Review Driver Expenses</span>
-            </button>
-          ) : (
-            <div className="px-3.5 py-2 text-xs text-slate-500 flex items-center gap-2 cursor-not-allowed opacity-50">
-              <Lock className="w-3.5 h-3.5" />
-              <span>Expenses (Locked by Admin)</span>
-            </div>
-          )}
-
-          {hasReportsPerm ? (
-            <button
-              onClick={() => {
-                setActiveTab('reports');
-                setIsMobileMenuOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'reports'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'text-purple-200 hover:bg-white/10 hover:text-white'
-                }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>Fleet Reports</span>
-            </button>
-          ) : (
-            <div className="px-3.5 py-2 text-xs text-slate-500 flex items-center gap-2 cursor-not-allowed opacity-50">
-              <Lock className="w-3.5 h-3.5" />
-              <span>Reports (Locked by Admin)</span>
-            </div>
-          )}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded-md uppercase font-bold ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'bg-purple-900/80 text-orange-300'
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </nav>
 
         {/* Bottom Actions */}
@@ -243,7 +195,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
           </button>
           <button
             onClick={logout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-rose-300 hover:bg-rose-500/10 hover:text-rose-200"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-rose-300 hover:bg-rose-500/10 hover:text-rose-200 transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -253,13 +205,13 @@ export const ManagerApp = ({ onNavigateHome }) => {
 
       {/* RIGHT SIDE: FIXED HEADER & SCROLLABLE MAIN CONTENT */}
       <div className="flex-1 h-full flex flex-col min-w-0 overflow-hidden">
-        {/* FIXED HEADER: Never moves when scrolling, fully responsive on mobile */}
+        {/* FIXED HEADER */}
         <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs gap-2">
           {/* Left: Mobile Menu Toggle + Company Logo + Current Tab */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-1.5 sm:p-2 rounded-lg text-slate-600 hover:bg-slate-100 shrink-0"
+              className="lg:hidden p-1.5 sm:p-2 rounded-lg text-slate-600 hover:bg-slate-100 shrink-0 cursor-pointer"
               aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
@@ -274,20 +226,20 @@ export const ManagerApp = ({ onNavigateHome }) => {
             </div>
             <div className="hidden sm:block h-5 w-px bg-slate-200 mx-1 shrink-0"></div>
             <h2 className="hidden sm:block font-heading font-extrabold text-base text-slate-900 capitalize truncate">
-              Manager Panel: {activeTab}
+              {activeTab.replace('_', ' ')}
             </h2>
           </div>
 
           {/* Right: Badge + Notifications + Sign Out */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <span className="hidden sm:inline-flex text-[11px] bg-purple-50 text-purple-800 border border-purple-200 px-2.5 py-1 rounded-full font-bold">
-              Restricted RBAC Session
+              ● Manager Mode (Read / Operations)
             </span>
 
             {/* Notification Bell */}
             <button
               onClick={() => setIsNotifOpen(true)}
-              className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors shrink-0"
+              className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors shrink-0 cursor-pointer"
               title="Notifications"
             >
               <Bell className="w-4 h-4" />
@@ -301,7 +253,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
             {/* Sign Out Button */}
             <button
               onClick={logout}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
@@ -311,35 +263,31 @@ export const ManagerApp = ({ onNavigateHome }) => {
         </header>
 
         {/* SCROLLABLE MAIN CONTENT */}
-        <main className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50/70">
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={onNavigateHome}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-purple-700 hover:border-purple-300 text-xs font-semibold shadow-xs transition-all cursor-pointer group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-purple-600" />
-              <span>Back to Role Selection</span>
-            </button>
-            <span className="text-[11px] text-slate-400 font-medium capitalize">
-              Manager Panel &bull; {activeTab.replace('_', ' ')}
-            </span>
-          </div>
-
-          {/* Privacy Enforcement Banner */}
-          <div className="p-4 bg-purple-900 text-white rounded-2xl shadow-sm flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold text-xs sm:text-sm">Client Privacy Policy Enforced</p>
-              <p className="text-[11px] text-purple-200 leading-relaxed mt-0.5">
-                Client personal phone numbers, emails, addresses, and ID proofs are confidential and
-                masked for Manager roles. You may coordinate trips, review receipts, and dispatch
-                vehicles in accordance with your permissions.
-              </p>
+        <main className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 bg-slate-50/70">
+          {activeTab !== 'dashboard' && (
+            <div className="mb-4 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setActiveTab('dashboard')}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-orange-600 hover:border-orange-300 text-xs font-semibold shadow-xs transition-all cursor-pointer group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-orange-500" />
+                <span>Back to Dashboard</span>
+              </button>
+              <span className="text-[11px] text-slate-400 font-medium capitalize">
+                Manager Suite &bull; {activeTab.replace('_', ' ')}
+              </span>
             </div>
-          </div>
+          )}
 
-          {activeTab === 'create_trip' && hasTripsPerm && (
+          {activeTab === 'dashboard' && (
+            <AdminDashboard
+              data={{ trips, packages, clients: [], users, expenses, activityLogs, vehicles }}
+              onNavigate={(tab) => setActiveTab(tab)}
+            />
+          )}
+
+          {activeTab === 'create_trip' && (
             <CreateTripView
               packages={packages}
               drivers={drivers}
@@ -351,7 +299,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
             />
           )}
 
-          {activeTab === 'trips' && hasTripsPerm && (
+          {activeTab === 'trips' && (
             <TripManagement
               trips={trips}
               packages={packages}
@@ -363,7 +311,23 @@ export const ManagerApp = ({ onNavigateHome }) => {
             />
           )}
 
-          {activeTab === 'expenses' && hasExpensePerm && (
+          {activeTab === 'vehicles' && (
+            <VehicleManagement
+              vehicles={vehicles}
+              onRefresh={fetchData}
+              role="manager"
+            />
+          )}
+
+          {activeTab === 'users' && (
+            <UserManagement
+              users={users}
+              onRefresh={fetchData}
+              role="manager"
+            />
+          )}
+
+          {activeTab === 'expenses' && (
             <ExpenseReview
               expenses={expenses}
               trips={trips}
@@ -373,21 +337,22 @@ export const ManagerApp = ({ onNavigateHome }) => {
             />
           )}
 
-          {activeTab === 'reports' && hasReportsPerm && (
-            <Reports trips={trips} expenses={expenses} users={drivers} packages={packages} />
+          {activeTab === 'salaries' && (
+            <SalariesAndSettlements
+              trips={trips}
+              drivers={drivers}
+              onRefresh={fetchData}
+              role="manager"
+            />
           )}
 
-          {activeTab === 'no_access' && (
-            <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
-              <Lock className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="font-heading font-bold text-lg text-slate-800">
-                No Modules Currently Assigned
-              </h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Please contact the Super Admin to configure your manager role permissions (View Trips,
-                Review Expenses, or View Reports).
-              </p>
-            </div>
+          {activeTab === 'reports' && (
+            <Reports
+              trips={trips}
+              expenses={expenses}
+              users={drivers}
+              packages={packages}
+            />
           )}
         </main>
       </div>

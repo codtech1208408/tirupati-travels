@@ -643,7 +643,7 @@ export const TripManagement = ({
                           <EyeIcon className="w-4 h-4" />
                         </button>
 
-                        {!isClosed && (
+                        {!isClosed && role === 'admin' && (
                           <button
                             onClick={() => handleOpenEdit(trip)}
                             className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"

@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { ManagerPermissionsModal } from './ManagerPermissionsModal';
 
-export const UserManagement = ({ users, onRefresh }) => {
+export const UserManagement = ({ users = [], onRefresh, role = 'admin' }) => {
   const [activeTab, setActiveTab] = useState('managers'); // 'managers' | 'drivers'
   const [editingUser, setEditingUser] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -180,13 +180,15 @@ export const UserManagement = ({ users, onRefresh }) => {
           </button>
         </div>
 
-        <button
-          onClick={() => handleOpenAdd(activeTab === 'managers' ? 'manager' : 'driver')}
-          className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New {activeTab === 'managers' ? 'Manager' : 'Driver'}</span>
-        </button>
+        {role === 'admin' && (
+          <button
+            onClick={() => handleOpenAdd(activeTab === 'managers' ? 'manager' : 'driver')}
+            className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New {activeTab === 'managers' ? 'Manager' : 'Driver'}</span>
+          </button>
+        )}
       </div>
 
       {/* MANAGERS TABLE */}
@@ -281,29 +283,33 @@ export const UserManagement = ({ users, onRefresh }) => {
                       </button>
                     </td>
                     <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => setPermissionsModalUser(mgr)}
-                          className="p-1.5 rounded-lg text-purple-700 hover:bg-purple-100 transition-colors"
-                          title="Manage Permissions"
-                        >
-                          <Key className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleOpenEdit(mgr)}
-                          className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-                          title="Edit Manager"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(mgr)}
-                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
-                          title="Delete Manager"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {role === 'admin' ? (
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => setPermissionsModalUser(mgr)}
+                            className="p-1.5 rounded-lg text-purple-700 hover:bg-purple-100 transition-colors"
+                            title="Manage Permissions"
+                          >
+                            <Key className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenEdit(mgr)}
+                            className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+                            title="Edit Manager"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(mgr)}
+                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
+                            title="Delete Manager"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-slate-400 font-medium italic">View Only</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -419,37 +425,41 @@ export const UserManagement = ({ users, onRefresh }) => {
                       </button>
                     </td>
                     <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => handleToggleStatus(drv)}
-                          className={`p-1.5 rounded-lg transition-colors ${
-                            drv.status === 'active'
-                              ? 'text-emerald-700 hover:bg-emerald-100'
-                              : 'text-red-600 hover:bg-red-100'
-                          }`}
-                          title={drv.status === 'active' ? 'Deactivate Driver' : 'Activate Driver'}
-                        >
-                          {drv.status === 'active' ? (
-                            <CheckCircle className="w-4 h-4" />
-                          ) : (
-                            <XCircle className="w-4 h-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleOpenEdit(drv)}
-                          className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-                          title="Edit Driver"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(drv)}
-                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
-                          title="Delete Driver"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {role === 'admin' ? (
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleToggleStatus(drv)}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              drv.status === 'active'
+                                ? 'text-emerald-700 hover:bg-emerald-100'
+                                : 'text-red-600 hover:bg-red-100'
+                            }`}
+                            title={drv.status === 'active' ? 'Deactivate Driver' : 'Activate Driver'}
+                          >
+                            {drv.status === 'active' ? (
+                              <CheckCircle className="w-4 h-4" />
+                            ) : (
+                              <XCircle className="w-4 h-4" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleOpenEdit(drv)}
+                            className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+                            title="Edit Driver"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(drv)}
+                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 transition-colors"
+                            title="Delete Driver"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-slate-400 font-medium italic">View Only</span>
+                      )}
                     </td>
                   </tr>
                 ))}

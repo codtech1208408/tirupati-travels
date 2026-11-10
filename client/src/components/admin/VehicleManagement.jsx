@@ -239,13 +239,15 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
             <div className="flex items-center justify-between pt-3 border-t border-slate-100">
               <span className="text-[11px] text-slate-400 font-mono">{veh.id}</span>
               <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => handleOpenEdit(veh)}
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                  title="Edit Vehicle"
-                >
-                  <Edit className="w-3.5 h-3.5" />
-                </button>
+                {role === 'admin' && (
+                  <button
+                    onClick={() => handleOpenEdit(veh)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                    title="Edit Vehicle"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 {role === 'admin' && (
                   <button
                     onClick={() => handleDelete(veh.id, veh.regNumber)}

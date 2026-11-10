@@ -464,7 +464,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
           </div>
 
           <div className="flex items-center gap-2">
-            {activeDriver.duesPending > 0 && (
+            {activeDriver.duesPending > 0 && role === 'admin' && (
               <button
                 type="button"
                 onClick={() => setBulkSettlingDriver(activeDriver)}
@@ -656,7 +656,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                           <span className="text-xs text-emerald-600 font-bold inline-flex items-center gap-1">
                             ✓ Settled
                           </span>
-                        ) : (
+                        ) : role === 'admin' ? (
                           <button
                             type="button"
                             onClick={() => setSettlingTrip(trip)}
@@ -665,6 +665,10 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
                             <CreditCard className="w-3.5 h-3.5" />
                             <span>Settle Due</span>
                           </button>
+                        ) : (
+                          <span className="text-[11px] text-amber-600 font-semibold">
+                            Pending Settlement
+                          </span>
                         )}
                       </td>
                     </tr>
