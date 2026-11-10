@@ -78,27 +78,27 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden">
+      <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overflow-hidden my-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#1e1035] to-[#2b144d] p-5 text-white flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[#1e1035] to-[#2b144d] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-orange-500 rounded-lg text-white">
               <DollarSign className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-heading font-bold text-lg">Close Trip Deal & Credit Wallet</h3>
+              <h3 className="font-heading font-bold text-base sm:text-lg">Close Trip Deal & Credit Wallet</h3>
               <p className="text-xs text-purple-200">
                 Final settlement for {trip.id} • Driver: {trip.driverName || 'Assigned Driver'}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded-full text-slate-300 hover:text-white">
+          <button onClick={onClose} className="p-1 rounded-full text-slate-300 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleCloseDeal} className="p-6 space-y-4">
+        <form onSubmit={handleCloseDeal} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />

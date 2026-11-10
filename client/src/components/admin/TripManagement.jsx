@@ -464,26 +464,28 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
       {/* CREATE / EDIT TRIP MODAL */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
-            <div className="bg-gradient-to-r from-[#1e1035] to-[#2b144d] p-5 text-white flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overflow-hidden my-auto">
+            <div className="bg-gradient-to-r from-[#1e1035] to-[#2b144d] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div>
-                <h3 className="font-heading font-bold text-lg">
+                <h3 className="font-heading font-bold text-base sm:text-lg">
                   {editingTrip ? `Edit Trip: ${editingTrip.id}` : 'Create New Fleet Trip'}
                 </h3>
-                <p className="text-xs text-purple-200">
+                <p className="text-[11px] sm:text-xs text-purple-200">
                   Assign verified drivers with real-time schedule conflict prevention
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-300 hover:text-white"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer text-sm shrink-0"
+                title="Close"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form id="trip-add-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               {dateClashError && (
                 <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
@@ -686,30 +688,33 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
                 ></textarea>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg text-xs shadow-md"
-                >
-                  Save Trip
-                </button>
-              </div>
             </form>
+
+            {/* Pinned Modal Footer: Always visible and accessible */}
+            <div className="p-4 sm:px-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-2.5 shrink-0 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setIsAddModalOpen(false)}
+                className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="trip-add-form"
+                className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg text-xs shadow-md transition-colors cursor-pointer"
+              >
+                Save Trip
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* TRIP DETAILS & STATUS CONTROLS MODAL */}
       {selectedTripDetails && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 p-5 sm:p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overflow-y-auto my-auto">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -806,22 +811,24 @@ export const TripManagement = ({ trips = [], packages = [], clients = [], driver
 
       {/* ADJUSTMENT ENTRY MODAL */}
       {adjModalTrip && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
-            <div className="bg-gradient-to-r from-purple-900 to-indigo-900 p-5 text-white flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[92vh] overflow-hidden my-auto">
+            <div className="bg-gradient-to-r from-purple-900 to-indigo-900 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-heading font-bold text-base">Record Adjustment Entry</h3>
                 <p className="text-xs text-purple-200">Closed Trip: {adjModalTrip.id}</p>
               </div>
               <button
+                type="button"
                 onClick={() => setAdjModalTrip(null)}
-                className="text-slate-300 hover:text-white"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 hover:text-white transition-colors cursor-pointer text-sm shrink-0"
+                title="Close"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleRecordAdjustment} className="p-6 space-y-4 text-xs">
+            <form onSubmit={handleRecordAdjustment} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 text-xs">
               <p className="text-slate-600">
                 Closed trips cannot be edited directly. Use this audit adjustment entry to update the
                 driver's wallet balance.
