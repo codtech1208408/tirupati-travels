@@ -568,6 +568,83 @@ export const DriverApp = ({ onNavigateHome }) => {
               )}
             </div>
 
+            {/* Upcoming Trips Section (Directly below Current Ongoing Trip) */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-heading font-bold text-lg text-slate-900">Upcoming Trips</h3>
+                  <p className="text-xs text-slate-500">Scheduled journeys assigned to you ({upcomingTrips.length})</p>
+                </div>
+                {upcomingTrips.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setTripsTab('upcoming');
+                      setCurrentScreen('trips');
+                    }}
+                    className="text-xs text-orange-600 font-bold hover:underline cursor-pointer"
+                  >
+                    All Upcoming ({upcomingTrips.length}) →
+                  </button>
+                )}
+              </div>
+
+              {upcomingTrips.length > 0 ? (
+                <div className="space-y-3">
+                  {upcomingTrips.map((trip) => (
+                    <div
+                      key={trip.id}
+                      onClick={() => {
+                        setSelectedTrip(trip);
+                        setCurrentScreen('trip_details');
+                      }}
+                      className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-orange-300 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-xs text-slate-900 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                            {trip.id}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold">
+                            Upcoming
+                          </span>
+                          {trip.clientName && (
+                            <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">
+                              👤 {trip.clientName}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-orange-600 transition-colors">
+                          {trip.name}
+                        </h4>
+                        <p className="text-xs text-slate-600 flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                          <span className="truncate max-w-md">{trip.route}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 text-xs">
+                        <div className="text-left sm:text-right">
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Pickup Date</span>
+                          <span className="font-semibold text-slate-800">
+                            {new Date(trip.startDate).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-orange-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-8 text-center text-slate-400 border border-dashed rounded-2xl text-xs">
+                  No upcoming trips scheduled at the moment
+                </div>
+              )}
+            </div>
+
             {/* Quick 4 Action Cards for Desktop & Mobile */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div
