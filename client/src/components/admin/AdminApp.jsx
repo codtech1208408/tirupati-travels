@@ -113,7 +113,6 @@ export const AdminApp = ({ onNavigateHome }) => {
     { id: 'create_trip', label: 'Create New Trip', icon: PlusCircle, badge: 'New' },
     { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
     { id: 'vehicles', label: 'Fleet Vehicles', icon: Car, badge: `${vehicles.length || 0}` },
-    { id: 'clients', label: 'Clients / Travellers', icon: Users, badge: 'Privacy' },
     {
       id: 'inquiries',
       label: 'Inquiries & Leads',
@@ -308,10 +307,6 @@ export const AdminApp = ({ onNavigateHome }) => {
 
           {activeTab === 'vehicles' && (
             <VehicleManagement vehicles={vehicles} onRefresh={fetchData} role="admin" />
-          )}
-
-          {activeTab === 'clients' && (
-            <ClientManagement clients={clients} onRefresh={fetchData} />
           )}
 
           {(activeTab === 'trips' || activeTab === 'create_trip') && (
