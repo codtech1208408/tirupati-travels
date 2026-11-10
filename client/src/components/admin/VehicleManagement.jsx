@@ -431,3 +431,4 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
     </div>
   );
 };
+

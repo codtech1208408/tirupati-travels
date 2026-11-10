@@ -17,6 +17,7 @@ import {
   Sparkles,
   ArrowLeft,
   PlusCircle,
+  Car,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { AdminDashboard } from './AdminDashboard';
