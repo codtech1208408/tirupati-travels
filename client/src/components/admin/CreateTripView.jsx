@@ -245,23 +245,6 @@ export const CreateTripView = ({
     <div className="max-w-4xl mx-auto">
       {/* Main Trip Creation Form Card */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        {/* Banner Header */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-[#1e1035] via-[#2d144d] to-[#3f196a] text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-400/40 flex items-center justify-center text-orange-400 font-bold">
-              <Plus className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="font-heading font-extrabold text-base sm:text-lg text-white">
-                Create New Fleet Trip
-              </h2>
-              <p className="text-xs text-purple-200">
-                Assign verified drivers with real-time schedule conflict prevention
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Notifications / Alerts */}
         {dateClashError && (
           <div className="m-5 sm:m-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-start gap-2.5">
