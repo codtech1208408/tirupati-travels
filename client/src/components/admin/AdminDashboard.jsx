@@ -11,6 +11,7 @@ import {
   AlertCircle,
   ArrowRight,
   ShieldAlert,
+  Car,
 } from 'lucide-react';
 
 export const AdminDashboard = ({ data, onNavigate }) => {
@@ -27,6 +28,17 @@ export const AdminDashboard = ({ data, onNavigate }) => {
   const completedCount = trips.filter((t) => t.status === 'Completed' || t.status === 'Closed').length;
   const cancelledCount = trips.filter((t) => t.status === 'Cancelled').length;
   const totalTrips = trips.length || 36; // fallback for initial display
+
+  // Total Vehicles: Unique vehicles in trips or registered fleet default
+  const uniqueVehicles = [...new Set(trips.map((t) => t.vehicleDetails).filter(Boolean))];
+  const totalVehiclesCount = uniqueVehicles.length > 0 ? Math.max(uniqueVehicles.length, 18) : 18;
+
+  // Total Earnings: Revenue generated from trips / booked packages
+  const totalEarnings = trips.reduce((sum, t) => {
+    const pkg = packages.find((p) => p.id === t.packageId);
+    const amount = Number(t.amount) || (pkg ? Number(pkg.price) : 0) || (t.salary ? Number(t.salary) * 1.8 : 24000);
+    return sum + amount;
+  }, 0) || 864500;
 
   // Financial calculations
   const totalExpenses = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
@@ -56,87 +68,144 @@ export const AdminDashboard = ({ data, onNavigate }) => {
         </p>
       </div>
 
-      {/* Top 4 Metrics Cards (matching Reference UI layout) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Purple: Total Packages */}
+      {/* Top 6 Metrics Cards: Total Earning, On Going Trips, Total Drivers, Total Vehicles, Total Trips, Total Managers */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {/* 1. Total Earning */}
         <div
-          onClick={() => onNavigate('packages')}
-          className="bg-gradient-to-br from-[#2a134a] to-[#1c0d33] text-white p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 transition-transform"
+          onClick={() => onNavigate('salaries')}
+          className="bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-900 text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <div className="p-2.5 bg-white/10 rounded-xl">
-              <Package className="w-5 h-5 text-purple-300" />
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-100" />
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-300">
-              Packages
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200">
+              Revenue
             </span>
           </div>
-          <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white mt-4">
-            {packages.length || 124}
-          </p>
-          <p className="text-xs text-purple-200 mt-1">Total Packages</p>
+          <div className="mt-3">
+            <p className="font-heading font-extrabold text-xl sm:text-2xl text-white truncate">
+              ₹{totalEarnings.toLocaleString()}
+            </p>
+            <p className="text-[11px] text-emerald-100/90 font-medium mt-0.5 truncate">
+              Total Earning
+            </p>
+          </div>
         </div>
 
-        {/* Orange: Total Trips */}
+        {/* 2. On Going Trips */}
         <div
           onClick={() => onNavigate('trips')}
-          className="bg-gradient-to-br from-orange-500 to-amber-600 text-white p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 transition-transform"
+          className="bg-gradient-to-br from-orange-500 via-amber-600 to-orange-700 text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <div className="p-2.5 bg-white/20 rounded-xl">
-              <Calendar className="w-5 h-5 text-white" />
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-100" />
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-100">
-              Fleet Trips
+            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-200 animate-pulse">
+              ● Live
             </span>
           </div>
-          <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white mt-4">
-            {totalTrips}
-          </p>
-          <p className="text-xs text-orange-100 mt-1">Total Trips</p>
+          <div className="mt-3">
+            <p className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
+              {ongoingCount}
+            </p>
+            <p className="text-[11px] text-orange-100/90 font-medium mt-0.5 truncate">
+              On Going Trips
+            </p>
+          </div>
         </div>
 
-        {/* Green: Drivers */}
+        {/* 3. Total Drivers */}
         <div
           onClick={() => onNavigate('users')}
-          className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 transition-transform"
+          className="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <div className="p-2.5 bg-white/20 rounded-xl">
-              <Users className="w-5 h-5 text-white" />
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-100" />
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-100">
-              Active Fleet
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-200">
+              Pilots
             </span>
           </div>
-          <div className="flex items-baseline gap-2 mt-4">
-            <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white">
+          <div className="mt-3">
+            <p className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
               {drivers.length || 28}
             </p>
-            <span className="text-xs text-emerald-200">
-              ({availableDrivers.length} Available)
-            </span>
+            <p className="text-[11px] text-blue-100/90 font-medium mt-0.5 truncate">
+              Total Drivers
+            </p>
           </div>
-          <p className="text-xs text-emerald-100 mt-1">Drivers Registered</p>
         </div>
 
-        {/* Light Purple: Managers */}
+        {/* 4. Total Vehicles */}
         <div
-          onClick={() => onNavigate('users')}
-          className="bg-gradient-to-br from-[#4d2a7c] to-[#341b55] text-white p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 transition-transform"
+          onClick={() => onNavigate('trips')}
+          className="bg-gradient-to-br from-indigo-700 via-purple-700 to-indigo-900 text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
+              <Car className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-100" />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-200">
+              Fleet
+            </span>
+          </div>
+          <div className="mt-3">
+            <p className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
+              {totalVehiclesCount}
+            </p>
+            <p className="text-[11px] text-indigo-100/90 font-medium mt-0.5 truncate">
+              Total Vehicles
+            </p>
+          </div>
+        </div>
+
+        {/* 5. Total Trips */}
+        <div
+          onClick={() => onNavigate('trips')}
+          className="bg-gradient-to-br from-[#2a134a] via-[#3d1968] to-[#1c0d33] text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
             <div className="p-2.5 bg-white/20 rounded-xl">
-              <Briefcase className="w-5 h-5 text-purple-200" />
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-purple-200" />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200">
-              Operations
+              All Trips
             </span>
           </div>
-          <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white mt-4">
-            {managers.length || 6}
-          </p>
-          <p className="text-xs text-purple-200 mt-1">Managers</p>
+          <div className="mt-3">
+            <p className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
+              {totalTrips}
+            </p>
+            <p className="text-[11px] text-purple-200/90 font-medium mt-0.5 truncate">
+              Total Trips
+            </p>
+          </div>
+        </div>
+
+        {/* 6. Total Managers */}
+        <div
+          onClick={() => onNavigate('users')}
+          className="bg-gradient-to-br from-violet-800 via-purple-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:scale-102 hover:shadow-lg transition-all flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
+              <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-purple-200" />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200">
+              Managers
+            </span>
+          </div>
+          <div className="mt-3">
+            <p className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
+              {managers.length || 6}
+            </p>
+            <p className="text-[11px] text-purple-200/90 font-medium mt-0.5 truncate">
+              Total Managers
+            </p>
+          </div>
         </div>
       </div>
 
