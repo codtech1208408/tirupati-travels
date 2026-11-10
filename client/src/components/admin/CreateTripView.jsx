@@ -225,7 +225,7 @@ export const CreateTripView = ({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save trip');
 
-      setSuccessMessage('✓ Trip created successfully! Redirecting to Trips & Dispatch...');
+      setSuccessMessage('✓ Trip created successfully!');
       if (onRefresh) await onRefresh();
 
       // Automatically transition to Trips & Dispatch tab so user sees their newly created trip
@@ -242,44 +242,7 @@ export const CreateTripView = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Top Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-orange-100 text-orange-700 font-bold text-[11px] mb-2 uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Dedicated Trip Creation</span>
-            </div>
-            <h2 className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight">
-              Create New Fleet Trip
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Fill in trip details, itinerary, and assign available verified pilots. Created trips will immediately appear in the <strong>Trips & Dispatch</strong> tab.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
-              title="Reset fields to blank"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Form</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigate && onNavigate('trips')}
-              className="px-3.5 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>View All Trips →</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <div className="max-w-4xl mx-auto">
       {/* Main Trip Creation Form Card */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         {/* Banner Header */}
@@ -289,17 +252,14 @@ export const CreateTripView = ({
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-heading font-bold text-base sm:text-lg text-white">
-                Trip Specifications & Dispatch Details
-              </h3>
+              <h2 className="font-heading font-extrabold text-base sm:text-lg text-white">
+                Create New Fleet Trip
+              </h2>
               <p className="text-xs text-purple-200">
-                Driver conflict prevention & dynamic day-by-day routing
+                Assign verified drivers with real-time schedule conflict prevention
               </p>
             </div>
           </div>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/10 text-orange-300 border border-white/15">
-            Step 1 of 1
-          </span>
         </div>
 
         {/* Notifications / Alerts */}
@@ -611,25 +571,23 @@ export const CreateTripView = ({
           </div>
 
           {/* Form Actions Footer */}
-          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={handleReset}
-              className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+              className="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel / Reset
+              Cancel
             </button>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{loading ? 'Creating Trip...' : 'Save Trip & View in Dispatch'}</span>
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-7 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{loading ? 'Saving...' : 'Save Trip'}</span>
+            </button>
           </div>
         </form>
       </div>

@@ -830,3 +830,4 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], onRefresh, ro
     </div>
   );
 };
+
