@@ -355,10 +355,11 @@ export const CreateTripView = ({
                 <button
                   type="button"
                   onClick={handleAddDay}
-                  className="px-3 py-1.5 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Add Day"
+                  aria-label="Add Day"
+                  className="w-8 h-8 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>+ Add Day</span>
                 </button>
               </div>
 
