@@ -451,12 +451,9 @@ export const AdminDashboard = ({ data, onNavigate }) => {
         <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-heading font-bold text-base text-slate-900">Recent Activities</h3>
-            <button
-              onClick={() => onNavigate('activity')}
-              className="text-xs font-semibold text-purple-700 hover:text-purple-800"
-            >
-              Full Audit Log →
-            </button>
+            <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+              ● Live Feed
+            </span>
           </div>
 
           <div className="space-y-3.5">

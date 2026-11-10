@@ -118,7 +118,6 @@ export const AdminApp = ({ onNavigateHome }) => {
     { id: 'expenses', label: 'Expense Review', icon: Receipt },
     { id: 'salaries', label: 'Salaries & Settlements', icon: DollarSign },
     { id: 'reports', label: 'Reports & Export', icon: FileText },
-    { id: 'activity', label: 'Audit Activity', icon: Clock },
   ];
 
   return (
@@ -357,8 +356,6 @@ export const AdminApp = ({ onNavigateHome }) => {
           {activeTab === 'reports' && (
             <Reports trips={trips} expenses={expenses} users={users} packages={packages} />
           )}
-
-          {activeTab === 'activity' && <ActivityLogs logs={activityLogs} />}
         </main>
       </div>
 
