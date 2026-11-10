@@ -12,6 +12,7 @@ import {
   Bell,
   ArrowLeft,
   Users,
+  PlusCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { TripManagement } from '../admin/TripManagement';
@@ -138,6 +139,27 @@ export const ManagerApp = ({ onNavigateHome }) => {
 
         {/* Navigation Items (Only permitted items show) */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {hasTripsPerm && (
+            <button
+              onClick={() => {
+                setActiveTab('create_trip');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeTab === 'create_trip'
+                  ? 'bg-orange-500 text-white shadow-md'
+                  : 'text-purple-200 hover:bg-white/10 hover:text-white'
+                }`}
+            >
+              <div className="flex items-center gap-3">
+                <PlusCircle className="w-4 h-4" />
+                <span>Create New Trip</span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-900/80 text-orange-300 uppercase font-bold">
+                New
+              </span>
+            </button>
+          )}
+
           {hasTripsPerm ? (
             <button
               onClick={() => {
@@ -296,14 +318,16 @@ export const ManagerApp = ({ onNavigateHome }) => {
             </div>
           </div>
 
-          {activeTab === 'trips' && hasTripsPerm && (
+          {(activeTab === 'trips' || activeTab === 'create_trip') && hasTripsPerm && (
             <TripManagement
+              key={activeTab}
               trips={trips}
               packages={packages}
               clients={[]}
               drivers={drivers}
               onRefresh={fetchData}
               role="manager"
+              initialOpenAdd={activeTab === 'create_trip'}
             />
           )}
 

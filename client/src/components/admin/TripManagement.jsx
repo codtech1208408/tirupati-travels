@@ -22,10 +22,10 @@ import {
 } from 'lucide-react';
 import { SalaryClosingModal } from './SalaryClosingModal';
 
-export const TripManagement = ({ trips = [], packages = [], clients = [], drivers = [], onRefresh, role = 'admin' }) => {
+export const TripManagement = ({ trips = [], packages = [], clients = [], drivers = [], onRefresh, role = 'admin', initialOpenAdd = false }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(initialOpenAdd);
   const [editingTrip, setEditingTrip] = useState(null);
   const [closingTrip, setClosingTrip] = useState(null);
   const [selectedTripDetails, setSelectedTripDetails] = useState(null);

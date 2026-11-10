@@ -46,25 +46,14 @@ export const AdminDashboard = ({ data, onNavigate }) => {
 
   return (
     <div className="space-y-6">
-      {/* Page Title & Quick Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight">
-            Admin Fleet & Trip Overview
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Real-time status of packages, assigned drivers, and financial trip settlements
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => onNavigate('trips')}
-            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-1.5"
-          >
-            <span>+ Create New Trip</span>
-          </button>
-        </div>
+      {/* Page Title Header */}
+      <div>
+        <h1 className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight">
+          Admin Fleet & Trip Overview
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">
+          Real-time status of packages, assigned drivers, and financial trip settlements
+        </p>
       </div>
 
       {/* Top 4 Metrics Cards (matching Reference UI layout) */}

@@ -16,6 +16,7 @@ import {
   Bell,
   Sparkles,
   ArrowLeft,
+  PlusCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { AdminDashboard } from './AdminDashboard';
@@ -101,9 +102,10 @@ export const AdminApp = ({ onNavigateHome }) => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'create_trip', label: 'Create New Trip', icon: PlusCircle, badge: 'New' },
+    { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
     { id: 'packages', label: 'Packages', icon: Package },
     { id: 'clients', label: 'Clients / Travellers', icon: Users, badge: 'Privacy' },
-    { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
     {
       id: 'inquiries',
       label: 'Inquiries & Leads',
@@ -288,14 +290,16 @@ export const AdminApp = ({ onNavigateHome }) => {
             <ClientManagement clients={clients} onRefresh={fetchData} />
           )}
 
-          {activeTab === 'trips' && (
+          {(activeTab === 'trips' || activeTab === 'create_trip') && (
             <TripManagement
+              key={activeTab}
               trips={trips}
               packages={packages}
               clients={clients}
               drivers={users.filter((u) => u.role === 'driver')}
               onRefresh={fetchData}
               role="admin"
+              initialOpenAdd={activeTab === 'create_trip'}
             />
           )}
 
