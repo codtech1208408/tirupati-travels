@@ -113,7 +113,7 @@ export const AdminApp = ({ onNavigateHome }) => {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'create_trip', label: 'Create New Trip', icon: PlusCircle, badge: 'New' },
     { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
-    { id: 'vehicles', label: 'Fleet Vehicles', icon: Car, badge: `${vehicles.length || 0}` },
+    { id: 'vehicles', label: 'Create Vehicle', icon: Car, badge: `${vehicles.length || 0}` },
     { id: 'users', label: 'Managers & Drivers', icon: ShieldCheck },
     { id: 'expenses', label: 'Expense Review', icon: Receipt },
     { id: 'salaries', label: 'Salaries & Settlements', icon: DollarSign },

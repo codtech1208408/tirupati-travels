@@ -886,7 +886,7 @@ export const TripManagement = ({
                     />
                   )}
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Choose from registered fleet or create in Fleet Vehicles tab
+                    Choose from registered fleet or create in Create Vehicle tab
                   </p>
                 </div>
               </div>

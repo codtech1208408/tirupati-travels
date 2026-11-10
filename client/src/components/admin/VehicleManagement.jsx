@@ -149,7 +149,7 @@ export const VehicleManagement = ({ vehicles = [], onRefresh, role = 'admin' }) 
         <div>
           <h2 className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight flex items-center gap-2">
             <Car className="w-6 h-6 text-orange-500" />
-            <span>Fleet Vehicles & Asset Registry</span>
+            <span>Create Vehicle & Asset Registry</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
             Register and manage tour vehicles, passenger capacities, and registration numbers for instant trip allocation
