@@ -20,7 +20,6 @@ import {
   LogOut,
   Bell,
   Check,
-  Coins,
   ShieldCheck,
   FileText,
   TrendingUp,
