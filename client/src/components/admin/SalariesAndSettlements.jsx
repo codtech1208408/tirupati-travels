@@ -237,8 +237,8 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
             <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200">
               Total Earned
             </span>
-            <div className="p-2 bg-white/10 rounded-xl">
-              <IndianRupee className="w-4 h-4 text-purple-200" />
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
+              <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 text-purple-100" />
             </div>
           </div>
           <div className="mt-4">
@@ -332,8 +332,8 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
                 setStatusFilter('all');
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${selectedDriverId === 'all' && statusFilter === 'all'
-                  ? 'bg-purple-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-purple-900 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
             >
               All Drivers ({driverStats.length})
@@ -341,8 +341,8 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
             <button
               onClick={() => setStatusFilter(statusFilter === 'due' ? 'all' : 'due')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 ${statusFilter === 'due'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
                 }`}
             >
               <span>Has Dues</span>
@@ -362,8 +362,8 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
                 key={drv.id}
                 onClick={() => setSelectedDriverId(isSelected ? 'all' : drv.id)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${isSelected
-                    ? 'border-orange-500 bg-orange-50/40 ring-2 ring-orange-400/50 shadow-md'
-                    : 'border-slate-200 hover:border-orange-300 bg-white hover:bg-slate-50/70 shadow-xs'
+                  ? 'border-orange-500 bg-orange-50/40 ring-2 ring-orange-400/50 shadow-md'
+                  : 'border-slate-200 hover:border-orange-300 bg-white hover:bg-slate-50/70 shadow-xs'
                   }`}
               >
                 <div className="flex items-start justify-between gap-3">
