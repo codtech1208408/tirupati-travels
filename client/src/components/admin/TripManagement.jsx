@@ -12,7 +12,7 @@ import {
   AlertCircle,
   CheckCircle,
   CheckCircle2,
-  DollarSign,
+  IndianRupee,
   Search,
   Filter,
   Sparkles,
@@ -639,7 +639,7 @@ export const TripManagement = ({
                             className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm flex items-center gap-1.5 cursor-pointer animate-pulse"
                             title="Trip submitted as completed! Add driver salary and settle project"
                           >
-                            <DollarSign className="w-3.5 h-3.5" />
+                            <IndianRupee className="w-3.5 h-3.5" />
                             <span>{Number(trip.salary) > 0 ? 'Edit Salary / Settle' : '+ Add Salary'}</span>
                           </button>
                         )}
@@ -1143,7 +1143,7 @@ export const TripManagement = ({
                     }}
                     className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 shrink-0 cursor-pointer animate-pulse"
                   >
-                    <DollarSign className="w-3.5 h-3.5" />
+                    <IndianRupee className="w-3.5 h-3.5" />
                     <span>{Number(selectedTripDetails.salary) > 0 ? 'Edit Salary / Settle' : '+ Add Driver Salary'}</span>
                   </button>
                 </div>

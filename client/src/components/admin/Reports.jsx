@@ -7,7 +7,7 @@ import {
   Fuel,
   Car,
   Receipt,
-  DollarSign,
+  IndianRupee,
   Package,
   Users,
 } from 'lucide-react';
@@ -175,7 +175,7 @@ export const Reports = ({ trips = [], expenses = [], users = [], packages = [] }
           { id: 'driver', label: 'Driver Report', icon: Users },
           { id: 'fuel', label: 'Fuel Expense', icon: Fuel },
           { id: 'toll', label: 'Toll Report', icon: Car },
-          { id: 'salary', label: 'Salary & Payout', icon: DollarSign },
+          { id: 'salary', label: 'Salary & Payout', icon: IndianRupee },
           { id: 'package', label: 'Package Report', icon: Package },
         ].map((item) => {
           const Icon = item.icon;

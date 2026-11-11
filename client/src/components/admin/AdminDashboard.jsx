@@ -4,7 +4,7 @@ import {
   Calendar,
   Users,
   Briefcase,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   Clock,
   CheckCircle2,
@@ -77,7 +77,7 @@ export const AdminDashboard = ({ data, onNavigate }) => {
         >
           <div className="flex items-center justify-between">
             <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl">
-              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-100" />
+              <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-100" />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200">
               Revenue
@@ -344,7 +344,7 @@ export const AdminDashboard = ({ data, onNavigate }) => {
                 Driver & Fleet Expenses
               </span>
               <span className="p-2 bg-white/20 rounded-xl text-white">
-                <DollarSign className="w-4 h-4" />
+                <IndianRupee className="w-4 h-4" />
               </span>
             </div>
             <p className="font-heading font-extrabold text-2xl sm:text-3xl">

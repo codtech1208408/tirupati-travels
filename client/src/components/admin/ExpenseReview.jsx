@@ -11,7 +11,6 @@ import {
   Fuel,
   Car,
   Utensils,
-  DollarSign,
   AlertCircle,
   X,
   Sparkles,

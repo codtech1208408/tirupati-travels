@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  DollarSign,
   Receipt,
   CheckCircle2,
   AlertCircle,

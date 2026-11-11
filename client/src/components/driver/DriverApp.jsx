@@ -23,7 +23,6 @@ import {
   Coins,
   ShieldCheck,
   FileText,
-  DollarSign,
   TrendingUp,
   Sparkles,
   Menu,

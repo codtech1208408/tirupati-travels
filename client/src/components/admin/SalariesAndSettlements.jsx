@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  DollarSign,
+  IndianRupee,
   CheckCircle2,
   Clock,
   AlertCircle,
@@ -199,7 +199,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px] mb-2 uppercase tracking-wider">
-              <DollarSign className="w-3.5 h-3.5" />
+              <IndianRupee className="w-3.5 h-3.5" />
               <span>Pilot Settlements & Payouts</span>
             </div>
             <h2 className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight">
@@ -238,7 +238,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
               Total Earned
             </span>
             <div className="p-2 bg-white/10 rounded-xl">
-              <DollarSign className="w-4 h-4 text-purple-200" />
+              <IndianRupee className="w-4 h-4 text-purple-200" />
             </div>
           </div>
           <div className="mt-4">

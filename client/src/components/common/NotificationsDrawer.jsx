@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCheck, Bell, Calendar, Receipt, DollarSign, Info } from 'lucide-react';
+import { X, CheckCheck, Bell, Calendar, Receipt, IndianRupee, Info } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const NotificationsDrawer = ({ isOpen, onClose }) => {
@@ -15,7 +15,7 @@ export const NotificationsDrawer = ({ isOpen, onClose }) => {
       case 'expense_approved':
         return <Receipt className="w-5 h-5 text-emerald-600" />;
       case 'deal_closed':
-        return <DollarSign className="w-5 h-5 text-orange-600" />;
+        return <IndianRupee className="w-5 h-5 text-orange-600" />;
       default:
         return <Info className="w-5 h-5 text-blue-600" />;
     }

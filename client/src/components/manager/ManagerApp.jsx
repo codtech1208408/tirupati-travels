@@ -4,7 +4,7 @@ import {
   Calendar,
   Car,
   Receipt,
-  DollarSign,
+  IndianRupee,
   FileText,
   ShieldCheck,
   LogOut,
@@ -99,7 +99,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
     { id: 'vehicles', label: 'Create Vehicle', icon: Car, badge: `${vehicles.length || 0}` },
     { id: 'users', label: 'Managers & Drivers', icon: ShieldCheck },
     { id: 'expenses', label: 'Expense Review', icon: Receipt },
-    { id: 'salaries', label: 'Salaries & Settlements', icon: DollarSign },
+    { id: 'salaries', label: 'Salaries & Settlements', icon: IndianRupee },
     { id: 'reports', label: 'Reports & Export', icon: FileText },
   ];
 

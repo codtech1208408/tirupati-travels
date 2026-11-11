@@ -656,5 +656,57 @@
       "status": "New",
       "createdAt": "2026-11-06T09:30:00.000Z"
     }
+  ],
+  "vehicles": [
+    {
+      "id": "VEH-001",
+      "regNumber": "AP 39 AB 1234",
+      "vehicleType": "Tempo Traveller Luxury AC (12 Seater)",
+      "model": "Force Tempo Traveller 3350",
+      "capacity": 12,
+      "fuelType": "Diesel",
+      "status": "Active",
+      "createdAt": "2026-11-11T11:05:08.933Z"
+    },
+    {
+      "id": "VEH-002",
+      "regNumber": "AP 39 TT 5678",
+      "vehicleType": "Toyota Innova Crysta (7 Seater)",
+      "model": "Innova Crysta 2.4 VX",
+      "capacity": 7,
+      "fuelType": "Diesel",
+      "status": "Active",
+      "createdAt": "2026-11-11T11:05:08.933Z"
+    },
+    {
+      "id": "VEH-003",
+      "regNumber": "AP 03 BX 9012",
+      "vehicleType": "Swift Dzire Luxury Sedan (4 Seater)",
+      "model": "Maruti Suzuki Dzire",
+      "capacity": 4,
+      "fuelType": "Petrol / CNG",
+      "status": "Active",
+      "createdAt": "2026-11-11T11:05:08.933Z"
+    },
+    {
+      "id": "VEH-004",
+      "regNumber": "AP 39 CC 3456",
+      "vehicleType": "Force Urbania Executive (10 Seater)",
+      "model": "Force Urbania 3615",
+      "capacity": 10,
+      "fuelType": "Diesel",
+      "status": "Active",
+      "createdAt": "2026-11-11T11:05:08.933Z"
+    },
+    {
+      "id": "VEH-005",
+      "regNumber": "AP 03 DY 7890",
+      "vehicleType": "Ashok Leyland Air Suspended Coach (32 Seater)",
+      "model": "Ashok Leyland Viking Coach",
+      "capacity": 32,
+      "fuelType": "Diesel",
+      "status": "Active",
+      "createdAt": "2026-11-11T11:05:08.933Z"
+    }
   ]
 }
