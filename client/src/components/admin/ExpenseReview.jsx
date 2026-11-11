@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Receipt,
+  ReceiptIndianRupee,
   CheckCircle,
   XCircle,
   Flag,
@@ -95,7 +95,7 @@ export const ExpenseReview = ({ expenses = [], trips = [], drivers = [], onRefre
       case 'Food':
         return <Utensils className="w-4 h-4 text-emerald-600" />;
       default:
-        return <Receipt className="w-4 h-4 text-slate-600" />;
+        return <ReceiptIndianRupee className="w-4 h-4 text-slate-600" />;
     }
   };
 

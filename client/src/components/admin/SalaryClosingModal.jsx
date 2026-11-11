@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  Receipt,
+  ReceiptIndianRupee,
   CheckCircle2,
   AlertCircle,
   Wallet,
@@ -174,7 +174,7 @@ export const SalaryClosingModal = ({ trip, isOpen, onClose, onSuccess }) => {
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 text-xs">
             <div className="flex items-center justify-between font-semibold text-slate-700">
               <span className="flex items-center gap-1.5">
-                <Receipt className="w-4 h-4 text-orange-500" />
+                <ReceiptIndianRupee className="w-4 h-4 text-orange-500" />
                 Trip On-Road Expenses ({expenses.length})
               </span>
               <span className="font-heading font-bold text-slate-900">

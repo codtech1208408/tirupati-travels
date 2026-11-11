@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Calendar,
-  Receipt,
+  ReceiptIndianRupee,
   Wallet,
   User,
   ArrowLeft,
@@ -312,7 +312,7 @@ export const DriverApp = ({ onNavigateHome }) => {
           {[
             { id: 'dashboard', label: 'Dashboard', icon: Car },
             { id: 'trips', label: 'My Trips', icon: Calendar },
-            { id: 'add_expense', label: 'Add Expense', icon: Receipt },
+            { id: 'add_expense', label: 'Add Expense', icon: ReceiptIndianRupee },
             { id: 'wallet', label: 'My Wallet', icon: Wallet },
             { id: 'availability', label: 'Availability', icon: ShieldCheck },
             { id: 'profile', label: 'Profile', icon: User },
@@ -669,7 +669,7 @@ export const DriverApp = ({ onNavigateHome }) => {
                 className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-all cursor-pointer text-center"
               >
                 <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center mx-auto mb-2">
-                  <Receipt className="w-6 h-6" />
+                  <ReceiptIndianRupee className="w-6 h-6" />
                 </div>
                 <h4 className="font-heading font-bold text-sm text-slate-900">Add Expense</h4>
                 <p className="text-[11px] text-slate-500 mt-0.5">Fuel, tolls, food</p>
@@ -1438,7 +1438,7 @@ export const DriverApp = ({ onNavigateHome }) => {
         {[
           { id: 'dashboard', label: 'Home', icon: Car },
           { id: 'trips', label: 'Trips', icon: Calendar },
-          { id: 'add_expense', label: 'Add Exp', icon: Receipt },
+          { id: 'add_expense', label: 'Add Exp', icon: ReceiptIndianRupee },
           { id: 'wallet', label: 'Wallet', icon: Wallet },
           { id: 'profile', label: 'Profile', icon: User },
         ].map((item) => {

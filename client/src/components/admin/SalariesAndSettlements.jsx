@@ -15,7 +15,7 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
-  Receipt,
+  ReceiptIndianRupee,
   Check,
 } from 'lucide-react';
 
@@ -723,7 +723,7 @@ export const SalariesAndSettlements = ({ trips = [], drivers = [], expenses = []
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95">
             <div className="p-4 bg-gradient-to-r from-[#1e1035] to-[#3a1768] text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-orange-400" />
+                <ReceiptIndianRupee className="w-5 h-5 text-orange-400" />
                 <h3 className="font-heading font-bold text-base text-white">
                   Settle Trip Due Salary
                 </h3>

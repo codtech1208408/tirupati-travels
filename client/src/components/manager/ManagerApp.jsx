@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   Calendar,
   Car,
-  Receipt,
+  ReceiptIndianRupee,
   IndianRupee,
   FileText,
   ShieldCheck,
@@ -98,7 +98,7 @@ export const ManagerApp = ({ onNavigateHome }) => {
     { id: 'trips', label: 'Trips & Dispatch', icon: Calendar },
     { id: 'vehicles', label: 'Create Vehicle', icon: Car, badge: `${vehicles.length || 0}` },
     { id: 'users', label: 'Managers & Drivers', icon: ShieldCheck },
-    { id: 'expenses', label: 'Expense Review', icon: Receipt },
+    { id: 'expenses', label: 'Expense Review', icon: ReceiptIndianRupee },
     { id: 'salaries', label: 'Salaries & Settlements', icon: IndianRupee },
     { id: 'reports', label: 'Reports & Export', icon: FileText },
   ];

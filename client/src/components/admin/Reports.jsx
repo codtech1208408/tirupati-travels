@@ -6,7 +6,7 @@ import {
   Calendar,
   Fuel,
   Car,
-  Receipt,
+  ReceiptIndianRupee,
   IndianRupee,
   Package,
   Users,
